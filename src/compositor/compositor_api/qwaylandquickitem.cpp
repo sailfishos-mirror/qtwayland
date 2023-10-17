@@ -759,7 +759,7 @@ void QWaylandQuickItem::keyPressEvent(QKeyEvent *event)
 void QWaylandQuickItem::keyReleaseEvent(QKeyEvent *event)
 {
     Q_D(QWaylandQuickItem);
-    if (d->shouldSendInputEvents() && hasFocus()) {
+    if (d->shouldSendInputEvents()) {
         QWaylandSeat *seat = compositor()->seatFor(event);
         seat->sendFullKeyEvent(event);
     } else {
