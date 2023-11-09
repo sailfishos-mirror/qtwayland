@@ -1,5 +1,5 @@
 // Copyright (C) 2017 Jolla Ltd, author: <giulio.camuffo@jollamobile.com>
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial
 
 #ifndef QQUICKWAYLANDSURFACE_H
 #define QQUICKWAYLANDSURFACE_H

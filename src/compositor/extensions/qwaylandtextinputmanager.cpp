@@ -1,5 +1,5 @@
 // Copyright (C) 2017-2016 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial
 
 #include "qwaylandtextinputmanager.h"
 #include "qwaylandtextinputmanager_p.h"

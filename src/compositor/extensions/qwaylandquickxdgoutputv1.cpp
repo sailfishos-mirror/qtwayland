@@ -1,5 +1,5 @@
 // Copyright (C) 2019 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial
 
 #include <QWaylandCompositor>
 #include <QWaylandOutput>
