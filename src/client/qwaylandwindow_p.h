@@ -229,6 +229,8 @@ public:
     void removeChildPopup(QWaylandWindow* child);
     void closeChildPopups();
 
+    bool windowEvent(QEvent *event) override;
+
 public slots:
     void applyConfigure();
 

@@ -1629,6 +1629,18 @@ void QWaylandWindow::closeChildPopups() {
         popup->reset();
     }
 }
+
+bool QWaylandWindow::windowEvent(QEvent *event)
+{
+    if (event->type() == QEvent::ApplicationPaletteChange
+        || event->type() == QEvent::ApplicationFontChange) {
+        if (mWindowDecorationEnabled && window()->isVisible())
+            mWindowDecoration->update();
+    }
+
+    return QPlatformWindow::windowEvent(event);
+}
+
 }
 
 QT_END_NAMESPACE
