@@ -182,7 +182,6 @@ void QWaylandShmBackingStore::endPaint()
 void QWaylandShmBackingStore::ensureSize()
 {
     waylandWindow()->setBackingStore(this);
-    waylandWindow()->createDecoration();
     resize(mRequestedSize);
 }
 

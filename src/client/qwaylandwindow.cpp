@@ -31,6 +31,8 @@
 #include <QtCore/QDebug>
 #include <QtCore/QThread>
 
+#include <QtCore/private/qthread_p.h>
+
 #include <QtWaylandClient/private/qwayland-fractional-scale-v1.h>
 
 QT_BEGIN_NAMESPACE
@@ -942,6 +944,8 @@ void QWaylandWindow::setWindowFlags(Qt::WindowFlags flags)
 
 bool QWaylandWindow::createDecoration()
 {
+    Q_ASSERT_X(QThread::currentThreadId() == QThreadData::get2(thread())->threadId.loadRelaxed(),
+               "QWaylandWindow::createDecoration", "not called from main thread");
     if (!mDisplay->supportsWindowDecoration())
         return false;
 
@@ -1022,11 +1026,7 @@ bool QWaylandWindow::createDecoration()
         // size and are not redrawn, leaving the new buffer empty. As a simple
         // work-around, we trigger a full extra update whenever the client-side
         // window decorations are toggled while the window is showing.
-        // Note: createDecoration() is sometimes called from the render thread
-        // of Qt Quick. This is essentially wrong and could potentially cause problems,
-        // but until the underlying issue has been fixed, we have to use invokeMethod()
-        // here to avoid asserts.
-        QMetaObject::invokeMethod(window(), &QWindow::requestUpdate);
+        window()->requestUpdate();
     }
 
     return mWindowDecoration;

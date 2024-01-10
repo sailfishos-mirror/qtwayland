@@ -334,8 +334,6 @@ bool QWaylandGLContext::makeCurrent(QPlatformSurface *surface)
 
     if (m_currentWindow->isExposed())
         m_currentWindow->setCanResize(false);
-    if (m_decorationsContext != EGL_NO_CONTEXT && !m_currentWindow->decoration())
-        m_currentWindow->createDecoration();
 
     if (eglSurface == EGL_NO_SURFACE) {
         m_currentWindow->updateSurface(true);
