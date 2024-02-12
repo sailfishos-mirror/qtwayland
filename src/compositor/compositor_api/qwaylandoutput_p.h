@@ -74,10 +74,9 @@ public:
 
     void sendMode(const Resource *resource, const QWaylandOutputMode &mode);
     void sendModesInfo();
+    void sendDone();
 
     void handleWindowPixelSizeChanged();
-
-    QPointer<QWaylandXdgOutputV1> xdgOutput;
 
 protected:
     void output_bind_resource(Resource *resource) override;
