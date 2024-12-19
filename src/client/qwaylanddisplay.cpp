@@ -488,9 +488,11 @@ void QWaylandDisplay::handleScreenInitialized(QWaylandScreen *screen)
     mScreens.append(screen);
     QWindowSystemInterface::handleScreenAdded(screen);
     if (mPlaceholderScreen) {
-        QWindowSystemInterface::handleScreenRemoved(mPlaceholderScreen);
         // handleScreenRemoved deletes the platform screen
+        QPlatformScreen *s = mPlaceholderScreen;
         mPlaceholderScreen = nullptr;
+        QWindowSystemInterface::handleScreenRemoved(s);
+
     }
 }
 
