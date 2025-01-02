@@ -1,6 +1,6 @@
 // Copyright (C) 2017 The Qt Company Ltd.
 // Copyright (C) 2017 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>

@@ -1,5 +1,5 @@
 // Copyright (C) 2017 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QWAYLANDINPUTMETHODCONTROL_H
 #define QWAYLANDINPUTMETHODCONTROL_H
