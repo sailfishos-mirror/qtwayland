@@ -1,5 +1,5 @@
 // Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial
 
 #include "qwaylandinputdevice_p.h"
 
@@ -1301,8 +1301,7 @@ void QWaylandInputDevice::Keyboard::keyboard_key(uint32_t serial, uint32_t time,
         auto code = key + 8; // map to wl_keyboard::keymap_format::keymap_format_xkb_v1
 
         xkb_keysym_t sym = xkb_state_key_get_one_sym(mXkbState.get(), code);
-
-        Qt::KeyboardModifiers modifiers = mParent->modifiers();
+        Qt::KeyboardModifiers modifiers = QXkbCommon::modifiers(mXkbState.get(), sym);
 
         int qtkey = keysymToQtKey(sym, modifiers, mXkbState.get(), code);
         QString text = QXkbCommon::lookupString(mXkbState.get(), code);

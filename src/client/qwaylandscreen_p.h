@@ -1,5 +1,5 @@
 // Copyright (C) 2020 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial
 
 #ifndef QWAYLANDSCREEN_H
 #define QWAYLANDSCREEN_H
@@ -73,6 +73,8 @@ public:
     QPlatformCursor *cursor() const override;
 #endif
 
+    SubpixelAntialiasingType subpixelAntialiasingTypeHint() const override;
+
     uint32_t outputId() const { return m_outputId; }
     ::wl_output *output() const override
     {
@@ -117,6 +119,7 @@ protected:
     int mScale = 1;
     int mDepth = 32;
     int mRefreshRate = 60000;
+    int mSubpixel = -1;
     int mTransform = -1;
     QImage::Format mFormat = QImage::Format_ARGB32_Premultiplied;
     QSize mPhysicalSize;

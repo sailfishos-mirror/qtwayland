@@ -1,5 +1,5 @@
 // Copyright (C) 2016 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial
 
 #include <qpa/qplatforminputcontext.h>
 
@@ -46,6 +46,7 @@ QWaylandTextInputv2::~QWaylandTextInputv2()
 {
     if (m_resetCallback)
         wl_callback_destroy(m_resetCallback);
+    destroy();
 }
 
 void QWaylandTextInputv2::reset()
