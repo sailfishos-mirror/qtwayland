@@ -3,6 +3,7 @@
 
 #include <qpa/qplatformintegrationplugin.h>
 #include <QtWaylandClient/private/qwaylandintegration_p.h>
+#include <QtWaylandClient/private/qtwaylandclientglobal_p.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -18,9 +19,16 @@ public:
 
 QPlatformIntegration *QWaylandIntegrationPlugin::create(const QString& system, const QStringList& paramList)
 {
-    Q_UNUSED(paramList);
-    Q_UNUSED(system);
-    auto *integration =  new QWaylandIntegration();
+    Q_UNUSED(paramList)
+#if !QT_CONFIG(wayland_egl)
+    if (system == "wayland-egl")
+        return nullptr;
+#endif
+#if !QT_CONFIG(wayland_brcm)
+    if (system == "wayland-brcm")
+        return nullptr;
+#endif
+    auto *integration = new QWaylandIntegration(system);
 
     if (!integration->init()) {
         delete integration;
@@ -30,7 +38,7 @@ QPlatformIntegration *QWaylandIntegrationPlugin::create(const QString& system, c
     return integration;
 }
 
-}
+} // namespace QtWaylandClient
 
 QT_END_NAMESPACE
 

@@ -8,7 +8,7 @@
 #####################################################################
 
 qt_internal_add_plugin(QWaylandIntegrationPlugin
-    OUTPUT_NAME qwayland-generic
+    OUTPUT_NAME qwayland
     PLUGIN_TYPE platforms
     DEFAULT_IF "wayland" IN_LIST QT_QPA_PLATFORMS
     SOURCES
