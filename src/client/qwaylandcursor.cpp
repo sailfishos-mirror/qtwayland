@@ -1,11 +1,14 @@
 // Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial
 
 #include "qwaylandcursor_p.h"
 
 #include "qwaylanddisplay_p.h"
 #include "qwaylandinputdevice_p.h"
 #include "qwaylandshmbackingstore_p.h"
+
+#include <QtGui/private/qguiapplication_p.h>
+#include <qpa/qplatformtheme.h>
 
 #include <QtGui/QImageReader>
 #include <QDebug>
@@ -248,6 +251,13 @@ void QWaylandCursor::setPos(const QPoint &pos)
 {
     Q_UNUSED(pos);
     qCWarning(lcQpaWayland) << "Setting cursor position is not possible on wayland";
+}
+
+QSize QWaylandCursor::size() const
+{
+    if (const QPlatformTheme *theme = QGuiApplicationPrivate::platformTheme())
+        return theme->themeHint(QPlatformTheme::MouseCursorSize).toSize();
+    return QSize(24, 24);
 }
 
 } // namespace QtWaylandClient

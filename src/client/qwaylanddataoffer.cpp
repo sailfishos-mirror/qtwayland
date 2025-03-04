@@ -1,5 +1,5 @@
 // Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial
 
 #include "qwaylanddataoffer_p.h"
 #include "qwaylanddatadevicemanager_p.h"
@@ -40,19 +40,32 @@ static QByteArray convertData(const QString &originalMime, const QString &newMim
     // see also qtbase/src/plugins/platforms/xcb/qxcbmime.cpp
     if (originalMime == uriList() && newMime == mozUrl()) {
         if (data.size() > 1) {
-            const QString str = QString::fromUtf16(
-                  reinterpret_cast<const char16_t *>(data.constData()), data.size() / 2);
-            if (!str.isNull()) {
+            const quint8 byte0 = data.at(0);
+            const quint8 byte1 = data.at(1);
+
+            if ((byte0 == 0xff && byte1 == 0xfe) || (byte0 == 0xfe && byte1 == 0xff)
+                || (byte0 != 0 && byte1 == 0) || (byte0 == 0 && byte1 != 0)) {
                 QByteArray converted;
-                const auto urls = QStringView{str}.split(u'\n');
-                // Only the URL is interesting, skip the page title.
-                for (int i = 0; i < urls.size(); i += 2) {
-                    const QUrl url(urls.at(i).trimmed().toString());
-                    if (url.isValid()) {
-                        converted += url.toEncoded();
-                        converted += "\r\n";
+                const QString str = QString::fromUtf16(
+                      reinterpret_cast<const char16_t *>(data.constData()), data.size() / 2);
+                if (!str.isNull()) {
+                    const auto urls = QStringView{str}.split(u'\n');
+                    // Only the URL is interesting, skip the page title.
+                    for (int i = 0; i < urls.size(); i += 2) {
+                        const QUrl url(urls.at(i).trimmed().toString());
+                        if (url.isValid()) {
+                            converted += url.toEncoded();
+                            converted += "\r\n";
+                        }
                     }
                 }
+                return converted;
+            // 8 byte encoding, remove a possible 0 at the end.
+            } else {
+                QByteArray converted = data;
+                if (converted.endsWith('\0'))
+                    converted.chop(1);
+                converted += "\r\n";
                 return converted;
             }
         }
@@ -134,8 +147,11 @@ QWaylandMimeData::~QWaylandMimeData()
 
 void QWaylandMimeData::appendFormat(const QString &mimeType)
 {
-    m_types << mimeType;
-    m_data.remove(mimeType); // Clear previous contents
+    // "DELETE" is a potential leftover from XdndActionMode sent by e.g. Firefox, ignore it.
+    if (mimeType != QLatin1String("DELETE")) {
+        m_types << mimeType;
+        m_data.remove(mimeType); // Clear previous contents
+    }
 }
 
 bool QWaylandMimeData::hasFormat_sys(const QString &mimeType) const
