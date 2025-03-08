@@ -301,7 +301,7 @@ protected:
     QWaitCondition mFrameSyncWait;
 
     // True when we have called deliverRequestUpdate, but the client has not yet attached a new buffer
-    bool mWaitingForUpdate = false;
+    std::atomic_bool mWaitingForUpdate = false;
 
     QRecursiveMutex mResizeLock;
     bool mWaitingToApplyConfigure = false;
