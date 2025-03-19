@@ -25,7 +25,7 @@ SPDX-FileCopyrightText = "Copyright (C) 2024 The Qt Company Ltd."
 SPDX-License-Identifier = "LicenseRef-Qt-Commercial OR GPL-3.0-only"
 
 [[annotations]]
-path = ["src/plugins/**.json"]
+path = ["src/plugins/**.json", "src/client/qwayland.json"]
 precedence = "closest"
 comment = "module and plugins"
 SPDX-FileCopyrightText = "Copyright (C) 2024 The Qt Company Ltd."
