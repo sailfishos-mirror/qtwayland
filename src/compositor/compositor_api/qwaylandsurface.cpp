@@ -101,9 +101,9 @@ QWaylandSurfacePrivate::~QWaylandSurfacePrivate()
 
     bufferRef = QWaylandBufferRef();
 
-    for (QtWayland::FrameCallback *c : std::as_const(pendingFrameCallbacks))
-        c->destroy();
     for (QtWayland::FrameCallback *c : std::as_const(frameCallbacks))
+        c->destroy();
+    for (QtWayland::FrameCallback *c : std::as_const(pendingFrameCallbacks))
         c->destroy();
 }
 
