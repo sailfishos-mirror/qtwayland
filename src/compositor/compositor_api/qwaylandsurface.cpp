@@ -49,13 +49,15 @@ public:
     }
     void destroy()
     {
+        surface = nullptr;
         if (resource)
             wl_resource_destroy(resource);
         else
             delete this;
     }
-    void send(uint time)
+    void sendAndDestroy(uint time)
     {
+        surface = nullptr;
         wl_callback_send_done(resource, time);
         wl_resource_destroy(resource);
     }
@@ -109,8 +111,8 @@ QWaylandSurfacePrivate::~QWaylandSurfacePrivate()
 
 void QWaylandSurfacePrivate::removeFrameCallback(QtWayland::FrameCallback *callback)
 {
-    pendingFrameCallbacks.removeOne(callback);
-    frameCallbacks.removeOne(callback);
+    if (!frameCallbacks.removeOne(callback))
+        pendingFrameCallbacks.removeOne(callback);
 }
 
 void QWaylandSurfacePrivate::notifyViewsAboutDestruction()
@@ -727,8 +729,7 @@ void QWaylandSurface::sendFrameCallbacks()
     int i = 0;
     while (i < d->frameCallbacks.size()) {
         if (d->frameCallbacks.at(i)->canSend) {
-            d->frameCallbacks.at(i)->surface = nullptr;
-            d->frameCallbacks.at(i)->send(time);
+            d->frameCallbacks.at(i)->sendAndDestroy(time);
             d->frameCallbacks.removeAt(i);
         } else {
             i++;
