@@ -305,7 +305,15 @@ void QWaylandSurfacePrivate::surface_set_buffer_transform(Resource *resource, in
 {
     Q_UNUSED(resource);
     Q_Q(QWaylandSurface);
-    QScreen *screen = QGuiApplication::primaryScreen();
+    QScreen *screen = nullptr;
+    if (auto *view = q->primaryView()) {
+        if (auto *output = view->output()) {
+            if (auto *window = output->window())
+                screen = window->screen();
+        }
+    }
+    if (screen == nullptr)
+        screen = QGuiApplication::primaryScreen();
     bool isPortrait = screen->primaryOrientation() == Qt::PortraitOrientation;
     Qt::ScreenOrientation oldOrientation = contentOrientation;
     switch (orientation) {
