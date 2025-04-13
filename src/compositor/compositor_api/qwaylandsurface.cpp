@@ -216,10 +216,12 @@ void QWaylandSurfacePrivate::surface_commit(Resource *)
     QSize oldDestinationSize = destinationSize;
     bool oldHasContent = hasContent;
     int oldBufferScale = bufferScale;
+    Qt::ScreenOrientation oldContentOrientation = contentOrientation;
 
     // Update all internal state
     if (pending.buffer.hasBuffer() || pending.newlyAttached)
         bufferRef = pending.buffer;
+    contentOrientation = pending.contentOrientation;
     bufferScale = pending.bufferScale;
     bufferSize = bufferRef.size();
     QSize surfaceSize = bufferSize / bufferScale;
@@ -280,6 +282,9 @@ void QWaylandSurfacePrivate::surface_commit(Resource *)
 
     emit q->damaged(damage);
 
+    if (oldContentOrientation != contentOrientation)
+        emit q->contentOrientationChanged();
+
     if (oldBufferSize != bufferSize)
         emit q->bufferSizeChanged();
 
@@ -314,23 +319,23 @@ void QWaylandSurfacePrivate::surface_set_buffer_transform(Resource *resource, in
     }
     if (screen == nullptr)
         screen = QGuiApplication::primaryScreen();
-    bool isPortrait = screen->primaryOrientation() == Qt::PortraitOrientation;
-    Qt::ScreenOrientation oldOrientation = contentOrientation;
+    Qt::ScreenOrientation newContentOrientation = screen->primaryOrientation();
+    bool isPortrait = newContentOrientation == Qt::PortraitOrientation;
     switch (orientation) {
         case WL_OUTPUT_TRANSFORM_90:
-            contentOrientation = isPortrait ? Qt::InvertedLandscapeOrientation : Qt::PortraitOrientation;
+            newContentOrientation = isPortrait ? Qt::InvertedLandscapeOrientation : Qt::PortraitOrientation;
             break;
         case WL_OUTPUT_TRANSFORM_180:
-            contentOrientation = isPortrait ? Qt::InvertedPortraitOrientation : Qt::InvertedLandscapeOrientation;
+            newContentOrientation = isPortrait ? Qt::InvertedPortraitOrientation : Qt::InvertedLandscapeOrientation;
             break;
         case WL_OUTPUT_TRANSFORM_270:
-            contentOrientation = isPortrait ? Qt::LandscapeOrientation : Qt::InvertedPortraitOrientation;
+            newContentOrientation = isPortrait ? Qt::LandscapeOrientation : Qt::InvertedPortraitOrientation;
             break;
         default:
-            contentOrientation = Qt::PrimaryOrientation;
+            newContentOrientation = Qt::PrimaryOrientation;
+            break;
     }
-    if (contentOrientation != oldOrientation)
-        emit q->contentOrientationChanged();
+    pending.contentOrientation = newContentOrientation;
 }
 
 void QWaylandSurfacePrivate::surface_set_buffer_scale(QtWaylandServer::wl_surface::Resource *resource, int32_t scale)

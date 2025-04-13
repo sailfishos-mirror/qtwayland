@@ -125,6 +125,7 @@ public: //member variables
         QRectF sourceGeometry;
         QSize destinationSize;
         QRegion opaqueRegion;
+        Qt::ScreenOrientation contentOrientation = Qt::PrimaryOrientation;
     } pending;
 
     QPoint lastLocalMousePos;
