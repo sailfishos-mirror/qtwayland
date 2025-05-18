@@ -1,5 +1,5 @@
 // Copyright (C) 2016 Jolla Ltd, author: <giulio.camuffo@jollamobile.com>
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial
 
 #include <QtWaylandCompositor/private/qwlserverbufferintegrationplugin_p.h>
 #include <QtWaylandCompositor/private/qwlserverbufferintegration_p.h>

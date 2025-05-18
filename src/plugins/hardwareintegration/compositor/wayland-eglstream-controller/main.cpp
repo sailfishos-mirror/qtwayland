@@ -1,5 +1,5 @@
 // Copyright (C) 2019 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial
 
 #include <QtWaylandCompositor/private/qwlclientbufferintegrationfactory_p.h>
 #include <QtWaylandCompositor/private/qwlclientbufferintegrationplugin_p.h>
