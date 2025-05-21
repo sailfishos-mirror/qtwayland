@@ -25,7 +25,7 @@ qt_manual_moc(moc_files
     xdgshell.h
 )
 
-add_library(SharedClientTest
+add_library(SharedWaylandClientTest
     OBJECT
         corecompositor.cpp corecompositor.h
         coreprotocol.cpp coreprotocol.h
@@ -43,7 +43,7 @@ add_library(SharedClientTest
         ${moc_files}
 )
 
-qt6_generate_wayland_protocol_server_sources(SharedClientTest
+qt6_generate_wayland_protocol_server_sources(SharedWaylandClientTest
     FILES
         ${protocols_dir}/cursor-shape/cursor-shape-v1.xml
         ${protocols_dir}/fullscreen-shell/fullscreen-shell-unstable-v1.xml
@@ -65,7 +65,7 @@ if(QT_FEATURE_opengl)
     set(optional_libraries Qt::OpenGL)
 endif()
 
-target_link_libraries(SharedClientTest
+target_link_libraries(SharedWaylandClientTest
     PUBLIC
         Qt::Gui
         ${optional_libraries}
@@ -74,4 +74,4 @@ target_link_libraries(SharedClientTest
         Threads::Threads # special case
 )
 
-target_include_directories(SharedClientTest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(SharedWaylandClientTest PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
