@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 function(qt_internal_get_wayland_protocols_dir out_var)
-    if(QT_SUPERBUILD)
+    if(QT_SUPERBUILD AND NOT QT_INTERNAL_BUILD_STANDALONE_PARTS)
         set(qtbase_wayland_protocols_dir
             "${QT_BUILD_DIR}/${INSTALL_SHAREDIR}/qt6/wayland/protocols/")
     else()
@@ -13,7 +13,7 @@ function(qt_internal_get_wayland_protocols_dir out_var)
 endfunction()
 
 function(qt_internal_get_wayland_extensions_dir out_var)
-    if(QT_SUPERBUILD)
+    if(QT_SUPERBUILD AND NOT QT_INTERNAL_BUILD_STANDALONE_PARTS)
         set(qtbase_wayland_extensions_dir
             "${QT_BUILD_DIR}/${INSTALL_SHAREDIR}/qt6/wayland/extensions/")
     else()
