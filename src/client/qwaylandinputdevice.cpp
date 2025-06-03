@@ -1,5 +1,5 @@
 // Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "qwaylandinputdevice_p.h"
 
@@ -70,11 +70,12 @@ QWaylandInputDevice::Keyboard::Keyboard(QWaylandInputDevice *p)
             return;
         }
         mRepeatTimer.setInterval(1000 / mRepeatRate);
-        handleKey(mRepeatKey.time, QEvent::KeyRelease, mRepeatKey.key, mRepeatKey.modifiers,
-                  mRepeatKey.code, mRepeatKey.nativeVirtualKey, mRepeatKey.nativeModifiers,
+        Qt::KeyboardModifiers modifiers = this->modifiers();
+        handleKey(mRepeatKey.time, QEvent::KeyRelease, mRepeatKey.key, modifiers,
+                  mRepeatKey.code, mRepeatKey.nativeVirtualKey, this->mNativeModifiers,
                   mRepeatKey.text, true);
-        handleKey(mRepeatKey.time, QEvent::KeyPress, mRepeatKey.key, mRepeatKey.modifiers,
-                  mRepeatKey.code, mRepeatKey.nativeVirtualKey, mRepeatKey.nativeModifiers,
+        handleKey(mRepeatKey.time, QEvent::KeyPress, mRepeatKey.key, modifiers,
+                  mRepeatKey.code, mRepeatKey.nativeVirtualKey, this->mNativeModifiers,
                   mRepeatKey.text, true);
     });
 }
@@ -868,8 +869,10 @@ public:
     WheelEvent(QWaylandWindow *surface, Qt::ScrollPhase phase, ulong timestamp, const QPointF &local,
                const QPointF &global, const QPoint &pixelDelta, const QPoint &angleDelta,
                Qt::MouseEventSource source, Qt::KeyboardModifiers modifiers)
-        : QWaylandPointerEvent(QEvent::Wheel, phase, surface, timestamp,
-                               local, global, pixelDelta, angleDelta, source, modifiers)
+        : QWaylandPointerEvent(QEvent::Wheel, phase, surface, timestamp, local, global,
+                               modifiers & Qt::AltModifier ? pixelDelta.transposed() : pixelDelta,
+                               modifiers & Qt::AltModifier ? angleDelta.transposed() : angleDelta,
+                               source, modifiers)
     {
     }
 };
@@ -1314,8 +1317,6 @@ void QWaylandInputDevice::Keyboard::keyboard_key(uint32_t serial, uint32_t time,
             mRepeatKey.code = code;
             mRepeatKey.time = time;
             mRepeatKey.text = text;
-            mRepeatKey.modifiers = modifiers;
-            mRepeatKey.nativeModifiers = mNativeModifiers;
             mRepeatKey.nativeVirtualKey = sym;
             mRepeatTimer.setInterval(mRepeatDelay);
             mRepeatTimer.start();

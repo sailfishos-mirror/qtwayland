@@ -1,6 +1,6 @@
 // Copyright (C) 2017 The Qt Company Ltd.
 // Copyright (C) 2017 Eurogiciel, author: <philippe.coval@eurogiciel.fr>
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "qwaylandxdgshell_p.h"
 
@@ -239,7 +239,9 @@ QWaylandXdgSurface::Popup::~Popup()
             leave = m_xdgSurface->window()->window();
         QWindowSystemInterface::handleLeaveEvent(leave);
 
-        if (QWindow *enter = QGuiApplication::topLevelAt(QCursor::pos())) {
+        QWindow *enter = nullptr;
+        if (m_parentXdgSurface && m_parentXdgSurface->window()) {
+            enter = m_parentXdgSurface->window()->window();
             const auto pos = m_xdgSurface->window()->display()->waylandCursor()->pos();
             QWindowSystemInterface::handleEnterEvent(enter, enter->handle()->mapFromGlobal(pos), pos);
         }
@@ -520,11 +522,7 @@ void QWaylandXdgSurface::setGrabPopup(QWaylandWindow *parent, QWaylandInputDevic
     // Synthesize Qt enter/leave events for popup
     if (!parent)
         return;
-    QWindow *current = QGuiApplication::topLevelAt(QCursor::pos());
     QWindow *leave = parent->window();
-    if (current != leave)
-        return;
-
     QWindowSystemInterface::handleLeaveEvent(leave);
 
     QWindow *enter = nullptr;

@@ -1,5 +1,5 @@
 // Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "qwaylandscreen_p.h"
 
@@ -161,6 +161,16 @@ QList<QPlatformScreen *> QWaylandScreen::virtualSiblings() const
         list << placeholder;
 
     return list;
+}
+
+QWindow *QWaylandScreen::topLevelAt(const QPoint & pos) const
+{
+    if (QWaylandWindow::fixedToplevelPositions) {
+        Q_UNUSED(pos);
+        return nullptr;
+    }
+
+    return QPlatformScreen::topLevelAt(pos);
 }
 
 Qt::ScreenOrientation QWaylandScreen::orientation() const

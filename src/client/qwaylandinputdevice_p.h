@@ -1,5 +1,5 @@
 // Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #ifndef QWAYLANDINPUTDEVICE_H
 #define QWAYLANDINPUTDEVICE_H
@@ -232,9 +232,7 @@ public:
         uint32_t code;
         uint32_t time;
         QString text;
-        Qt::KeyboardModifiers modifiers;
         uint32_t nativeVirtualKey;
-        uint32_t nativeModifiers;
     } mRepeatKey;
 
     QTimer mRepeatTimer;

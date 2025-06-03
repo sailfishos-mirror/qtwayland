@@ -1,5 +1,5 @@
 // Copyright (C) 2016 Klarälvdalens Datakonsult AB (KDAB).
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 
 #include "qwaylanddatadevice_p.h"
@@ -295,7 +295,8 @@ void QWaylandDataDevice::sendResponse(Qt::DropActions supportedActions, const QP
 
         m_dragOffer->accept(m_enterSerial, m_dragOffer->firstFormat());
     } else {
-        m_dragOffer->accept(m_enterSerial, QString());
+        // qtwaylandscanner doesn't support null strings yet (sends empty string), call it directly.
+        ::wl_data_offer_accept(m_dragOffer->object(), m_enterSerial, nullptr);
     }
 }
 

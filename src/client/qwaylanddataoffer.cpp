@@ -1,5 +1,5 @@
 // Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "qwaylanddataoffer_p.h"
 #include "qwaylanddatadevicemanager_p.h"
@@ -28,6 +28,11 @@ static QString uriList()
 static QString mozUrl()
 {
     return QStringLiteral("text/x-moz-url");
+}
+
+static QString portalFileTransfer()
+{
+    return QStringLiteral("application/vnd.portal.filetransfer");
 }
 
 static QByteArray convertData(const QString &originalMime, const QString &newMime, const QByteArray &data)
@@ -211,7 +216,9 @@ QVariant QWaylandMimeData::retrieveData_sys(const QString &mimeType, QMetaType t
 
     content = convertData(mimeType, mime, content);
 
-    m_data.insert(mimeType, content);
+    if (mimeType != portalFileTransfer())
+        m_data.insert(mimeType, content);
+
     return content;
 }
 

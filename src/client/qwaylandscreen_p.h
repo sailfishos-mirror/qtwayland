@@ -1,5 +1,5 @@
 // Copyright (C) 2020 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #ifndef QWAYLANDSCREEN_H
 #define QWAYLANDSCREEN_H
@@ -61,6 +61,8 @@ public:
 
     QDpi logicalDpi() const override;
     QList<QPlatformScreen *> virtualSiblings() const override;
+
+    QWindow *topLevelAt(const QPoint &point) const override;
 
     Qt::ScreenOrientation orientation() const override;
     int scale() const;
