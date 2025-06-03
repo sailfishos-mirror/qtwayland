@@ -510,7 +510,7 @@ void tst_WaylandCompositor::mapSurfaceHiDpi()
         QCOMPARE(damage, QRect(QPoint(), surfaceSize));
         verifyComittedState();
     });
-    QSignalSpy damagedSpy(waylandSurface, SIGNAL(damaged(const QRegion &)));
+    QSignalSpy damagedSpy(waylandSurface, SIGNAL(damaged(QRegion)));
 
     QObject::connect(waylandSurface, &QWaylandSurface::hasContentChanged, verifyComittedState);
     QSignalSpy hasContentSpy(waylandSurface, SIGNAL(hasContentChanged()));
@@ -528,7 +528,7 @@ void tst_WaylandCompositor::mapSurfaceHiDpi()
         QCOMPARE(offset, attachOffset);
         verifyComittedState();
     });
-    QSignalSpy offsetSpy(waylandSurface, SIGNAL(offsetForNextFrame(const QPoint &)));
+    QSignalSpy offsetSpy(waylandSurface, SIGNAL(offsetForNextFrame(QPoint)));
 
     // No state should be applied before the commit
     QCOMPARE(waylandSurface->bufferSize(), QSize());
@@ -605,7 +605,7 @@ void tst_WaylandCompositor::frameCallback()
     view->setSurface(waylandSurface);
     view->setOutput(compositor.defaultOutput());
 
-    QSignalSpy damagedSpy(waylandSurface, SIGNAL(damaged(const QRegion &)));
+    QSignalSpy damagedSpy(waylandSurface, SIGNAL(damaged(QRegion)));
 
     for (int i = 0; i < 10; ++i) {
         QSize size(i * 8 + 2, i * 8 + 2);
