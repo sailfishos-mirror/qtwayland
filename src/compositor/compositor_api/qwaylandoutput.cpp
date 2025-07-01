@@ -277,6 +277,15 @@ QWaylandOutput::QWaylandOutput(QWaylandCompositor *compositor, QWindow *window)
 QWaylandOutput::~QWaylandOutput()
 {
     Q_D(QWaylandOutput);
+
+    const auto surfaceViews = d->surfaceViews; // intentional copy
+    for (const QWaylandSurfaceViewMapper &surfacemapper : surfaceViews) {
+        for (QWaylandView *view : surfacemapper.views) {
+            if (view->output() == this)
+                view->setOutput(nullptr);
+        }
+    }
+
     if (d->compositor)
         QWaylandCompositorPrivate::get(d->compositor)->removeOutput(this);
 }
