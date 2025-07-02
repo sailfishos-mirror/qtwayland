@@ -1,5 +1,5 @@
 // Copyright (C) 2017 ITAGE Corporation, author: <yusuke.binsaki@itage.co.jp>
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "qwaylandivishellintegration.h"
 

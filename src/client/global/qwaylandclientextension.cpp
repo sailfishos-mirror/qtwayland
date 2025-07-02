@@ -1,6 +1,6 @@
 // Copyright (C) 2017 Erik Larsson.
 // Copyright (C) 2021 David Redondo <qt@david-redondo.de>
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "qwaylandclientextension.h"
 #include "qwaylandclientextension_p.h"
