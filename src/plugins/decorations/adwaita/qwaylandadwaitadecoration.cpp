@@ -33,7 +33,6 @@
 #include <QtWaylandClient/private/qwaylandshmbackingstore_p.h>
 #include <QtWaylandClient/private/qwaylandwindow_p.h>
 
-
 QT_BEGIN_NAMESPACE
 
 using namespace Qt::StringLiterals;
@@ -326,11 +325,16 @@ void QWaylandAdwaitaDecoration::loadConfiguration()
                 const QString buttonLayout = settings.value("org.gnome.desktop.wm.preferences"_L1).value("button-layout"_L1).toString();
                 if (!buttonLayout.isEmpty())
                     updateTitlebarLayout(buttonLayout);
-                // Workaround for QGtkStyle not having correct titlebar font
-                const QString titlebarFont =
-                    settings.value("org.gnome.desktop.wm.preferences"_L1).value("titlebar-font"_L1).toString();
-                if (titlebarFont.contains("bold"_L1, Qt::CaseInsensitive)) {
-                    m_font->setBold(true);
+                // Do not rely on titlebar-font in case titlebar-uses-desktop-font is set to true
+                // https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas/-/blob/main/schemas/org.gnome.desktop.wm.preferences.gschema.xml.in
+                const bool titlebarUseDesktopFont = settings.value("org.gnome.desktop.wm.preferences"_L1).value("titlebar-uses-desktop-font"_L1).toBool();
+                if (!titlebarUseDesktopFont) {
+                    // Workaround for QGtkStyle not having correct titlebar font
+                    const QString titlebarFont =
+                        settings.value("org.gnome.desktop.wm.preferences"_L1).value("titlebar-font"_L1).toString();
+                    if (titlebarFont.contains("bold"_L1, Qt::CaseInsensitive)) {
+                        m_font->setBold(true);
+                    }
                 }
             }
         }
