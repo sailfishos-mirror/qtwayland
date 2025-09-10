@@ -1,6 +1,6 @@
 // Copyright (C) 2017 The Qt Company Ltd.
 // Copyright (C) 2017 Eurogiciel, author: <philippe.coval@eurogiciel.fr>
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #ifndef QWAYLANDXDGSHELL_H
 #define QWAYLANDXDGSHELL_H

@@ -1,5 +1,5 @@
 // Copyright (C) 2021 LG Electronics Inc.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qwaylandcompositorpresentationtimeforeign_p.h"
 
