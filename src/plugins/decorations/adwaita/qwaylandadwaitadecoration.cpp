@@ -358,16 +358,16 @@ void QWaylandAdwaitaDecoration::updateColors(bool isDark)
 {
     qCDebug(lcQWaylandAdwaitaDecorationLog) << "Color scheme changed to: " << (isDark ? "dark" : "light");
 
-    m_colors = { { Background, isDark ? QColor(0x303030) : QColor(0xffffff) },
-                 { BackgroundInactive, isDark ? QColor(0x242424) : QColor(0xfafafa) },
-                 { Foreground, isDark ? QColor(0xffffff) : QColor(0x2e2e2e) },
-                 { ForegroundInactive, isDark ? QColor(0x919191) : QColor(0x949494) },
-                 { Border, isDark ? QColor(0x3b3b3b) : QColor(0xdbdbdb) },
-                 { BorderInactive, isDark ? QColor(0x303030) : QColor(0xdbdbdb) },
-                 { ButtonBackground, isDark ? QColor(0x444444) : QColor(0xebebeb) },
-                 { ButtonBackgroundInactive, isDark ? QColor(0x2e2e2e) : QColor(0xf0f0f0) },
-                 { HoveredButtonBackground, isDark ? QColor(0x4f4f4f) : QColor(0xe0e0e0) },
-                 { PressedButtonBackground, isDark ? QColor(0x6e6e6e) : QColor(0xc2c2c2) } };
+    m_colors = { { Background, isDark ? QColor(0x2e2e32) : QColor(0xffffff) },
+                 { BackgroundInactive, isDark ? QColor(0x222226) : QColor(0xfafafb) },
+                 { Foreground, isDark ? QColor(0xffffff) : QColor(0x333338) },
+                 { ForegroundInactive, isDark ? QColor(0x919193) : QColor(0x969699) },
+                 { Border, isDark ? QColor(0x2e2e32) : QColor(0xffffff) },
+                 { BorderInactive, isDark ? QColor(0x2e2e32) : QColor(0xffffff) },
+                 { ButtonBackground, isDark ? QColor(0x434347) : QColor(0xebebeb) },
+                 { ButtonBackgroundInactive, isDark ? QColor(0x2d2d31) : QColor(0xf0f0f1) },
+                 { HoveredButtonBackground, isDark ? QColor(0x4d4d51) : QColor(0xe0e0e1) },
+                 { PressedButtonBackground, isDark ? QColor(0x6c6c6f) : QColor(0xc2c2c3) } };
     requestRepaint();
 }
 
@@ -517,6 +517,13 @@ void QWaylandAdwaitaDecoration::drawButton(Button button, QPainter *painter)
         renderButtonIcon(iconFromButtonAndState(button, maximized), painter, adjustedBtnRect);
 }
 
+static QColor makeTransparent(const QColor &color, qreal level)
+{
+    QColor transparentColor = color;
+    transparentColor.setAlphaF(level);
+    return transparentColor;
+}
+
 QColor QWaylandAdwaitaDecoration::color(ColorType type, Button button)
 {
     const bool active = waylandWindow()->windowStates() & Qt::WindowActive;
@@ -530,7 +537,7 @@ QColor QWaylandAdwaitaDecoration::color(ColorType type, Button button)
         return active ? m_colors[Foreground] : m_colors[ForegroundInactive];
     case Border:
     case BorderInactive:
-        return active ? m_colors[Border] : m_colors[BorderInactive];
+        return active ? makeTransparent(m_colors[Border], 0.5) : makeTransparent(m_colors[BorderInactive], 0.5);
     case ButtonBackground:
     case ButtonBackgroundInactive:
     case HoveredButtonBackground: {
