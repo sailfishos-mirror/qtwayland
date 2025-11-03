@@ -919,8 +919,10 @@ void QWaylandOutput::frameStarted()
 {
     Q_D(QWaylandOutput);
     for (const QWaylandSurfaceViewMapper &surfacemapper : std::as_const(d->surfaceViews)) {
-        if (surfacemapper.maybePrimaryView())
-            surfacemapper.surface->frameStarted();
+        if (QWaylandView *primaryView = surfacemapper.maybePrimaryView()) {
+            if (Q_LIKELY(!QWaylandViewPrivate::get(primaryView)->independentFrameCallback))
+                surfacemapper.surface->frameStarted();
+        }
     }
 }
 
