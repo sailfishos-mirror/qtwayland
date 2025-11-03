@@ -45,10 +45,9 @@ struct QWaylandSurfaceViewMapper
 
     QWaylandView *maybePrimaryView() const
     {
-        for (int i = 0; i < views.size(); i++) {
-            if (surface && surface->primaryView() == views.at(i))
-                return views.at(i);
-        }
+        QWaylandView *primaryView = surface != nullptr ? surface->primaryView() : nullptr;
+        if (views.contains(primaryView))
+            return primaryView;
         return nullptr;
     }
 

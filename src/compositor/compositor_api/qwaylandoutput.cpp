@@ -164,11 +164,10 @@ void QWaylandOutputPrivate::handleWindowPixelSizeChanged()
 {
     Q_Q(QWaylandOutput);
     Q_ASSERT(window);
-    if (sizeFollowsWindow && currentMode <= modes.size() - 1) {
+    if (sizeFollowsWindow && currentMode < modes.size()) {
         if (currentMode >= 0) {
-            QWaylandOutputMode mode = modes.at(currentMode);
+            QWaylandOutputMode &mode = modes[currentMode];
             mode.setSize(windowPixelSize);
-            modes.replace(currentMode, mode);
             emit q->geometryChanged();
             if (!availableGeometry.isValid())
                 emit q->availableGeometryChanged();
@@ -207,7 +206,7 @@ void QWaylandOutputPrivate::removeView(QWaylandView *view, QWaylandSurface *surf
     for (int i = 0; i < surfaceViews.size(); i++) {
         if (surface == surfaceViews.at(i).surface) {
             bool removed = surfaceViews[i].views.removeOne(view);
-            if (surfaceViews.at(i).views.isEmpty() && removed) {
+            if (removed && surfaceViews.at(i).views.isEmpty()) {
                 if (surfaceViews.at(i).has_entered)
                     q->surfaceLeave(surface);
                 surfaceViews.remove(i);
@@ -521,11 +520,14 @@ void QWaylandOutput::addMode(const QWaylandOutputMode &mode, bool preferred)
         return;
     }
 
-    if (d->modes.indexOf(mode) < 0)
+    int index = d->modes.indexOf(mode);
+    if (index < 0) {
         d->modes.append(mode);
+        index = d->modes.size() - 1;
+    }
 
     if (preferred)
-        d->preferredMode = d->modes.indexOf(mode);
+        d->preferredMode = index;
 
     emit modeAdded();
 }
@@ -541,9 +543,7 @@ QWaylandOutputMode QWaylandOutput::currentMode() const
 {
     Q_D(const QWaylandOutput);
 
-    if (d->currentMode >= 0 && d->currentMode <= d->modes.size() - 1)
-        return d->modes.at(d->currentMode);
-    return QWaylandOutputMode();
+    return d->modes.value(d->currentMode);
 }
 
 /*!
@@ -909,8 +909,7 @@ void QWaylandOutput::setWindow(QWindow *window)
 void QWaylandOutput::frameStarted()
 {
     Q_D(QWaylandOutput);
-    for (int i = 0; i < d->surfaceViews.size(); i++) {
-        QWaylandSurfaceViewMapper &surfacemapper = d->surfaceViews[i];
+    for (const QWaylandSurfaceViewMapper &surfacemapper : std::as_const(d->surfaceViews)) {
         if (surfacemapper.maybePrimaryView())
             surfacemapper.surface->frameStarted();
     }
