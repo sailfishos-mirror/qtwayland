@@ -818,9 +818,9 @@ void QWaylandCompositor::setDefaultOutput(QWaylandOutput *output)
         return;
     bool alreadyAdded = d->outputs.removeOne(output);
     d->outputs.prepend(output);
-    emit defaultOutputChanged();
     if (!alreadyAdded)
         emit outputAdded(output);
+    emit defaultOutputChanged();
 }
 
 /*!
