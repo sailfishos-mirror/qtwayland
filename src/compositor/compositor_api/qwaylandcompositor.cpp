@@ -814,6 +814,10 @@ QWaylandOutput *QWaylandCompositor::defaultOutput() const
 void QWaylandCompositor::setDefaultOutput(QWaylandOutput *output)
 {
     Q_D(QWaylandCompositor);
+    if (Q_UNLIKELY(!output)) {
+        qWarning("Changing default output to null is not supported");
+        return;
+    }
     if (d->outputs.size() && d->outputs.first() == output)
         return;
     bool alreadyAdded = d->outputs.removeOne(output);
