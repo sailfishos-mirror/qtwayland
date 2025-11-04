@@ -9,6 +9,18 @@
 #include <wayland-server.h>
 
 QT_BEGIN_NAMESPACE
+/*!
+ * \qmltype XdgOutputV1
+ * \nativetype QWaylandXdgOutputV1
+ * \inqmlmodule QtWayland.Compositor.XdgShell
+ * \brief Represents a display in a compositor.
+ */
+
+/*!
+ * \class QWaylandXdgOutputV1
+ * \inmodule QtWaylandCompositor
+ * \brief Represents a display in a compositor.
+ */
 
 /*!
  * \qmltype XdgOutputManagerV1
@@ -218,6 +230,7 @@ QWaylandXdgOutputV1::~QWaylandXdgOutputV1()
 /*!
  * \property QWaylandXdgOutputV1::manager
  * \readonly
+ * \internal
  *
  * This property holds the object that manages this QWaylandXdgOutputV1.
  */

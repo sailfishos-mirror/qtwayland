@@ -662,6 +662,7 @@ void QWaylandQtShellSurface::surfaceCommitted()
 }
 
 /*!
+ * \internal
  * Returns the Wayland interface for the QWaylandQtShellSurface.
  */
 const wl_interface *QWaylandQtShellSurface::interface()
@@ -675,6 +676,7 @@ QByteArray QWaylandQtShellSurface::interfaceName()
 }
 
 /*!
+ * \internal
  * Returns the surface role for the QWaylandQtShellSurface.
  */
 QWaylandSurfaceRole *QWaylandQtShellSurface::role()
@@ -683,6 +685,7 @@ QWaylandSurfaceRole *QWaylandQtShellSurface::role()
 }
 
 /*!
+ * \internal
  * Returns the QWaylandQtShellSurface corresponding to the \a resource.
  */
 QWaylandQtShellSurface *QWaylandQtShellSurface::fromResource(wl_resource *resource)
