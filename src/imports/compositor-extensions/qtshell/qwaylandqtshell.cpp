@@ -37,7 +37,7 @@ QT_BEGIN_NAMESPACE
  *
  * For other use cases, consider using IviApplication or XdgShell instead.
  *
- * \qml
+ * \code
  * import QtWayland.Compositor.QtShell
  *
  * WaylandCompositor {
@@ -48,7 +48,7 @@ QT_BEGIN_NAMESPACE
  *         }
  *     }
  * }
- * \endqml
+ * \endcode
  */
 QWaylandQtShell::QWaylandQtShell()
     : QWaylandCompositorExtensionTemplate<QWaylandQtShell>(*new QWaylandQtShellPrivate())
