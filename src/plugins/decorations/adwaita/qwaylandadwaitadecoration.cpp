@@ -128,12 +128,12 @@ void QWaylandAdwaitaDecoration::paint(QPaintDevice *device)
      * Titlebar and window border
      */
     QPainterPath path;
-    const QPointF topLeft = { margins(ShadowsOnly).left() + 0.5,
-                              margins(ShadowsOnly).top() - 0.5 };
+    const QPointF topLeft = { margins(ShadowsOnly).left() + qreal(0.5),
+                              margins(ShadowsOnly).top() - qreal(0.5) };
     const int frameWidth = surfaceRect.width() - margins(ShadowsOnly).left()
-            - margins(ShadowsOnly).right() - 0.5;
+            - margins(ShadowsOnly).right() - qreal(0.5);
     const int frameHeight = surfaceRect.height() - margins(ShadowsOnly).top()
-            - margins(ShadowsOnly).bottom() + 0.5;
+            - margins(ShadowsOnly).bottom() + qreal(0.5);
     const QRectF fullFrameRect = QRectF(topLeft, QSizeF(frameWidth, frameHeight));
 
     // Maximized or tiled won't have rounded corners
