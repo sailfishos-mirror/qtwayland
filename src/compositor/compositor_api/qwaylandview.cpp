@@ -75,9 +75,10 @@ QWaylandView::~QWaylandView()
 }
 
 /*!
-* \internal
-*  Didn't we decide to remove this property?
-*/
+ * \property QWaylandView::renderObject
+ * \internal
+ * Didn't we decide to remove this property?
+ */
 QObject *QWaylandView::renderObject() const
 {
     Q_D(const QWaylandView);

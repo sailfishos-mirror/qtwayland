@@ -369,6 +369,15 @@ void QWaylandOutput::update()
  */
 
 /*!
+ * \property QWaylandOutput::compositor
+ *
+ * This property holds the compositor displaying content on this QWaylandOutput.
+ *
+ * \note This property can be set only once, before the QWaylandOutput has been
+ *       initialized.
+ */
+
+/*!
  * Returns the compositor for this QWaylandOutput.
  */
 QWaylandCompositor *QWaylandOutput::compositor() const

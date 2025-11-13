@@ -947,7 +947,20 @@ void QWaylandQuickItem::updateFocus()
   The default value of this property is \c null.
  */
 
-
+/*!
+ * \property QWaylandQuickItem::subsurfaceHandler
+ *
+ * This property provides a way to override the default subsurface behavior.
+ *
+ * By default, Qt will create a new QWaylandQuickItem as a child of this item
+ * and maintain the correct position.
+ *
+ * To override the default behavior, assign a handler object to this property.
+ * The handler must implement a \c handleSubsurfaceAdded(QWaylandSurface*)
+ * method.
+ *
+ * The default value of this property is \nullptr.
+ */
 QObject *QWaylandQuickItem::subsurfaceHandler() const
 {
     Q_D(const QWaylandQuickItem);
@@ -1611,6 +1624,23 @@ void QWaylandQuickItem::setTouchEventsEnabled(bool enabled)
     }
 }
 
+/*!
+ * \qmlproperty bool QtWayland.Compositor::WaylandQuickItem::inputEventsEnabled
+ *
+ * This property holds whether input events are enabled for this item.
+ *
+ * When \c true, the item will process and handle input events such as keyboard
+ * and mouse events; when \c false, input events are ignored.
+ */
+
+/*!
+ * \property QWaylandQuickItem::inputEventsEnabled
+ *
+ * This property holds whether input events are enabled for this item.
+ *
+ * When \c true, the item will process and handle input events such as keyboard
+ * and mouse events; when \c false, input events are ignored.
+ */
 bool QWaylandQuickItem::inputEventsEnabled() const
 {
     Q_D(const QWaylandQuickItem);
