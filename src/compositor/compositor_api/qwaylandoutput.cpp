@@ -918,6 +918,9 @@ void QWaylandOutput::setWindow(QWindow *window)
 void QWaylandOutput::frameStarted()
 {
     Q_D(QWaylandOutput);
+
+    d->canSendFrameCallbacks = true;
+
     for (const QWaylandSurfaceViewMapper &surfacemapper : std::as_const(d->surfaceViews)) {
         if (QWaylandView *primaryView = surfacemapper.maybePrimaryView()) {
             if (Q_LIKELY(!QWaylandViewPrivate::get(primaryView)->independentFrameCallback))
@@ -932,6 +935,12 @@ void QWaylandOutput::frameStarted()
 void QWaylandOutput::sendFrameCallbacks()
 {
     Q_D(QWaylandOutput);
+
+    if (Q_UNLIKELY(!d->canSendFrameCallbacks))
+        return;
+
+    d->canSendFrameCallbacks = false;
+
     for (int i = 0; i < d->surfaceViews.size(); i++) {
         const QWaylandSurfaceViewMapper &surfacemapper = d->surfaceViews.at(i);
         if (surfacemapper.surface && surfacemapper.surface->hasContent()) {

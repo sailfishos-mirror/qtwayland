@@ -70,7 +70,6 @@ public:
     }
     QWaylandSurface *surface = nullptr;
     wl_resource *resource = nullptr;
-    bool canSend = false;
 };
 }
 static QRegion infiniteRegion() {
@@ -745,9 +744,6 @@ QWaylandCompositor *QWaylandSurface::compositor() const
  */
 void QWaylandSurface::frameStarted()
 {
-    Q_D(QWaylandSurface);
-    for (QtWayland::FrameCallback *c : std::as_const(d->frameCallbacks))
-        c->canSend = true;
 }
 
 /*!
@@ -757,15 +753,9 @@ void QWaylandSurface::sendFrameCallbacks()
 {
     Q_D(QWaylandSurface);
     uint time = d->compositor->currentTimeMsecs();
-    int i = 0;
-    while (i < d->frameCallbacks.size()) {
-        if (d->frameCallbacks.at(i)->canSend) {
-            d->frameCallbacks.at(i)->sendAndDestroy(time);
-            d->frameCallbacks.removeAt(i);
-        } else {
-            i++;
-        }
-    }
+    const auto frameCallbacks = std::exchange(d->frameCallbacks, {});
+    for (auto *callback : frameCallbacks)
+        callback->sendAndDestroy(time);
 }
 
 /*!

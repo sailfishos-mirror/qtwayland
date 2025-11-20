@@ -101,6 +101,7 @@ private:
     int scaleFactor = 1;
     bool sizeFollowsWindow = false;
     bool initialized = false;
+    bool canSendFrameCallbacks = false;
     QSize windowPixelSize;
 
     Q_DISABLE_COPY(QWaylandOutputPrivate)
