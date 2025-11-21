@@ -310,7 +310,6 @@ void QWaylandSurfacePrivate::surface_commit(Resource *)
 
 void QWaylandSurfacePrivate::surface_set_buffer_transform(Resource *resource, int32_t orientation)
 {
-    Q_UNUSED(resource);
     Q_Q(QWaylandSurface);
     QScreen *screen = nullptr;
     if (auto *view = q->primaryView()) {
@@ -345,6 +344,8 @@ void QWaylandSurfacePrivate::surface_set_buffer_transform(Resource *resource, in
             return;
 
         default:
+            wl_resource_post_error(resource->handle, WL_SURFACE_ERROR_INVALID_TRANSFORM,
+                                   "invalid buffer transform");
             return;
     }
     pending.contentOrientation = newContentOrientation;
@@ -352,7 +353,12 @@ void QWaylandSurfacePrivate::surface_set_buffer_transform(Resource *resource, in
 
 void QWaylandSurfacePrivate::surface_set_buffer_scale(QtWaylandServer::wl_surface::Resource *resource, int32_t scale)
 {
-    Q_UNUSED(resource);
+    if (Q_UNLIKELY(scale <= 0)) {
+        wl_resource_post_error(resource->handle, WL_SURFACE_ERROR_INVALID_SCALE,
+                               "invalid buffer scale");
+        return;
+    }
+
     pending.bufferScale = scale;
 }
 
