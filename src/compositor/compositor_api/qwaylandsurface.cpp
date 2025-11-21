@@ -333,9 +333,19 @@ void QWaylandSurfacePrivate::surface_set_buffer_transform(Resource *resource, in
         case WL_OUTPUT_TRANSFORM_270:
             newContentOrientation = isPortrait ? Qt::LandscapeOrientation : Qt::InvertedPortraitOrientation;
             break;
-        default:
+        case WL_OUTPUT_TRANSFORM_NORMAL:
             newContentOrientation = Qt::PrimaryOrientation;
             break;
+
+        // Ignore these ones, at least for now
+        case WL_OUTPUT_TRANSFORM_FLIPPED:
+        case WL_OUTPUT_TRANSFORM_FLIPPED_90:
+        case WL_OUTPUT_TRANSFORM_FLIPPED_180:
+        case WL_OUTPUT_TRANSFORM_FLIPPED_270:
+            return;
+
+        default:
+            return;
     }
     pending.contentOrientation = newContentOrientation;
 }
