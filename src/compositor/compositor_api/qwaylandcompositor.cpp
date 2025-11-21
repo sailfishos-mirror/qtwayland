@@ -182,7 +182,7 @@ void QWaylandCompositorPrivate::init()
         if (socket_name.isEmpty())
             socket_name = qgetenv("WAYLAND_DISPLAY");
     }
-    wl_compositor::init(display, 4);
+    wl_compositor::init(display, 5);
     wl_subcompositor::init(display, 1);
 
 #if QT_CONFIG(wayland_datadevice)

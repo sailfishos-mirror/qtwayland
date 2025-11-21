@@ -164,10 +164,25 @@ void QWaylandSurfacePrivate::surface_destroy(Resource *resource)
     wl_resource_destroy(resource->handle);
 }
 
-void QWaylandSurfacePrivate::surface_attach(Resource *, struct wl_resource *buffer, int x, int y)
+void QWaylandSurfacePrivate::surface_offset(Resource *, int32_t x, int32_t y)
 {
-    pending.buffer = QWaylandBufferRef(getBuffer(buffer));
     pending.offset = QPoint(x, y);
+}
+
+void QWaylandSurfacePrivate::surface_attach(Resource *resource, struct wl_resource *buffer, int x, int y)
+{
+    if (resource->version() >= WL_SURFACE_OFFSET_SINCE_VERSION) {
+        if (Q_UNLIKELY(x != 0 || y != 0)) {
+            wl_resource_post_error(resource->handle, WL_SURFACE_ERROR_INVALID_OFFSET,
+                                   "invalid buffer offset");
+            return;
+        }
+        // The x and y arguments are ignored and do not change the pending state.
+    } else {
+        pending.offset = QPoint(x, y);
+    }
+
+    pending.buffer = QWaylandBufferRef(getBuffer(buffer));
     pending.newlyAttached = true;
 }
 
