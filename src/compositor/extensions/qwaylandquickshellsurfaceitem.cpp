@@ -336,7 +336,7 @@ void QWaylandQuickShellSurfaceItemPrivate::raise()
     const bool putOnBottom = staysOnBottom && !m_shellSurface->isModal();
 
     auto it = parent->childItems().crbegin();
-    auto skip = [this, putOnTop, putOnBottom](QQuickItem *item) {
+    auto skip = [putOnTop, putOnBottom](QQuickItem *item) {
         if (auto *surf = findSurfaceItemFromMoveItem(item))
             return (!putOnTop && onTop(surf)) || (putOnBottom && !onBottom(surf));
         return true; // ignore any other Quick items that may be there
@@ -369,7 +369,7 @@ void QWaylandQuickShellSurfaceItemPrivate::lower()
     const bool putOnBottom = staysOnBottom && !m_shellSurface->isModal();
 
     auto it = parent->childItems().cbegin();
-    auto skip = [this, putOnTop, putOnBottom](QQuickItem *item) {
+    auto skip = [putOnTop, putOnBottom](QQuickItem *item) {
         if (auto *surf = findSurfaceItemFromMoveItem(item))
             return (!putOnBottom && onBottom(surf)) || (putOnTop && !onTop(surf));
         return true; // ignore any other Quick items that may be there
