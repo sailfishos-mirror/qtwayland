@@ -1074,7 +1074,6 @@ void QWaylandQuickItem::handleSurfaceChanged()
 {
     Q_D(QWaylandQuickItem);
     if (d->oldSurface) {
-        disconnect(d->oldSurface.data(), &QWaylandSurface::hasContentChanged, this, &QWaylandQuickItem::surfaceMappedChanged);
         disconnect(d->oldSurface.data(), &QWaylandSurface::parentChanged, this, &QWaylandQuickItem::parentChanged);
         disconnect(d->oldSurface.data(), &QWaylandSurface::destinationSizeChanged, this, &QWaylandQuickItem::updateSize);
         disconnect(d->oldSurface.data(), &QWaylandSurface::bufferScaleChanged, this, &QWaylandQuickItem::updateSize);
@@ -1091,7 +1090,6 @@ void QWaylandQuickItem::handleSurfaceChanged()
 #endif
     }
     if (QWaylandSurface *newSurface = d->view->surface()) {
-        connect(newSurface, &QWaylandSurface::hasContentChanged, this, &QWaylandQuickItem::surfaceMappedChanged);
         connect(newSurface, &QWaylandSurface::parentChanged, this, &QWaylandQuickItem::parentChanged);
         connect(newSurface, &QWaylandSurface::destinationSizeChanged, this, &QWaylandQuickItem::updateSize);
         connect(newSurface, &QWaylandSurface::bufferScaleChanged, this, &QWaylandQuickItem::updateSize);
@@ -1166,14 +1164,6 @@ void QWaylandQuickItem::takeFocus(QWaylandSeat *device)
         if (textInputMethod)
             textInputMethod->setFocus(surface());
     }
-}
-
-/*!
- * \internal
- */
-void QWaylandQuickItem::surfaceMappedChanged()
-{
-    update();
 }
 
 /*!

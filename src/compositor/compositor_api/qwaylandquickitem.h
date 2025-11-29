@@ -121,8 +121,7 @@ public Q_SLOTS:
     void lower();
     void sendMouseMoveEvent(const QPointF &position, QWaylandSeat *seat = nullptr);
 
-private Q_SLOTS:
-    void surfaceMappedChanged();
+private:
     void handleSurfaceChanged();
     void parentChanged(QWaylandSurface *newParent, QWaylandSurface *oldParent);
     void updateSize();
