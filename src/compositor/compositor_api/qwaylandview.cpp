@@ -223,8 +223,8 @@ bool QWaylandView::advance()
     QMutexLocker locker(&d->bufferMutex);
     d->forceAdvanceSucceed = false;
     d->nextBufferCommitted = false;
-    d->currentBuffer = d->nextBuffer;
-    d->currentDamage = d->nextDamage;
+    d->currentBuffer = std::exchange(d->nextBuffer, {});
+    d->currentDamage = std::exchange(d->nextDamage, {});
     return true;
 }
 
