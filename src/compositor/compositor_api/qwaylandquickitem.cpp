@@ -1024,10 +1024,6 @@ void QWaylandQuickItem::setBufferLocked(bool locked)
 {
     Q_D(QWaylandQuickItem);
     d->view->setBufferLocked(locked);
-
-    // Apply the latest surface size
-    if (!locked)
-        updateSize();
 }
 
 /*!
@@ -1163,6 +1159,20 @@ void QWaylandQuickItem::takeFocus(QWaylandSeat *device)
         QWaylandQtTextInputMethod *textInputMethod = QWaylandQtTextInputMethod::findIn(target);
         if (textInputMethod)
             textInputMethod->setFocus(surface());
+    }
+}
+
+/*!
+ * \internal
+ */
+void QWaylandQuickItem::handleBufferLockedChanged()
+{
+    Q_D(QWaylandQuickItem);
+
+    // Apply the latest surface size
+    if (!d->view->isBufferLocked()) {
+        updateSize();
+        update();
     }
 }
 

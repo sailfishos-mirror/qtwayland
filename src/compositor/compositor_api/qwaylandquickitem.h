@@ -123,6 +123,7 @@ public Q_SLOTS:
 
 private:
     void handleSurfaceChanged();
+    void handleBufferLockedChanged();
     void parentChanged(QWaylandSurface *newParent, QWaylandSurface *oldParent);
     void updateSize();
     void updateBuffer(bool hasBuffer);

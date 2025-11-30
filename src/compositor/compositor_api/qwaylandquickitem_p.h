@@ -98,6 +98,7 @@ public:
         QObject::connect(view.data(), &QWaylandView::outputChanged, q, &QWaylandQuickItem::outputChanged);
         QObject::connect(view.data(), &QWaylandView::outputChanged, q, &QWaylandQuickItem::updateOutput);
         QObject::connect(view.data(), &QWaylandView::bufferLockedChanged, q, &QWaylandQuickItem::bufferLockedChanged);
+        QObject::connect(view.data(), &QWaylandView::bufferLockedChanged, q, &QWaylandQuickItem::handleBufferLockedChanged);
         QObject::connect(view.data(), &QWaylandView::allowDiscardFrontBufferChanged, q, &QWaylandQuickItem::allowDiscardFrontBufferChanged);
 
         q->updateWindow();
