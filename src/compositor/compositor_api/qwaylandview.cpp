@@ -117,6 +117,7 @@ void QWaylandViewPrivate::setSurface(QWaylandSurface *newSurface)
     nextBuffer = QWaylandBufferRef();
     nextBufferCommitted = false;
     nextDamage = QRegion();
+    forceAdvanceSucceed = false;
 
     if (surface) {
         QWaylandSurfacePrivate::get(surface)->refView(q);
@@ -291,6 +292,9 @@ void QWaylandView::setBufferLocked(bool locked)
         return;
     d->bufferLocked = locked;
     emit bufferLockedChanged();
+
+    if (d->surface == nullptr && !d->bufferLocked)
+        d->clearFrontBuffer();
 }
 /*!
  * \qmlproperty bool QtWayland.Compositor::WaylandView::allowDiscardFrontBuffer
