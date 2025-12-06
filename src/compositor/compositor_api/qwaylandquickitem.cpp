@@ -556,13 +556,15 @@ void QWaylandQuickItem::setSurface(QWaylandSurface *surface)
 {
     Q_D(QWaylandQuickItem);
     QWaylandSurface *oldSurf = d->view->surface();
-    QWaylandCompositor *oldComp = d->view->surface() ? d->view->surface()->compositor() : nullptr;
-    d->view->setSurface(surface);
-    QWaylandCompositor *newComp = d->view->surface() ? d->view->surface()->compositor() : nullptr;
+    if (oldSurf == surface)
+        return;
+
+    QWaylandCompositor *oldComp = oldSurf ? oldSurf->compositor() : nullptr;
+    QWaylandCompositor *newComp = surface ? surface->compositor() : nullptr;
     if (oldComp != newComp)
         emit compositorChanged();
-    if (oldSurf != surface)
-        emit surfaceChanged();
+
+    d->view->setSurface(surface);
 
     updateFocus();
     update();
