@@ -52,6 +52,7 @@ protected:
     EGLSurface eglSurfaceForPlatformSurface(QPlatformSurface *surface) override;
     EGLSurface createTemporaryOffscreenSurface() override;
     void destroyTemporaryOffscreenSurface(EGLSurface surface) override;
+    void runGLChecks() override;
 
 private:
     QWaylandDisplay *m_display = nullptr;
@@ -62,6 +63,7 @@ private:
     wl_surface *m_wlSurface = nullptr;
     wl_egl_window *m_eglWindow = nullptr;
     QWaylandEglWindow *m_currentWindow = nullptr;
+    bool m_doneCurrentWorkAround = false;
 };
 
 }
