@@ -1176,6 +1176,13 @@ void QWaylandQuickItem::handleBufferLockedChanged()
     }
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(7, 0, 0)
+void QWaylandQuickItem::surfaceMappedChanged()
+{
+    update();
+}
+#endif
+
 /*!
  * \internal
  */
