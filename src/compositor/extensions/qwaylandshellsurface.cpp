@@ -24,7 +24,8 @@
  *   provided container, and returns this if it is found.
  * \endlist
  *
- * The same usage pattern applies as for QWaylandCompositorExtensionTemplate.
+ * The same usage pattern applies as for QWaylandCompositorExtensionTemplate, with \a T
+ * being the subclass itself.
  *
  * \sa { Custom Shell}
  */
