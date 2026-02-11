@@ -81,6 +81,7 @@ public:
 
     void initSubsurface(QWaylandSurface *parent, struct ::wl_client *client, int id, int version);
     bool isSubsurface() const { return subsurface; }
+    QPoint subsurfacePosition() const { return subsurface ? subsurface->position() : QPoint(); }
     QWaylandSurfacePrivate *parentSurface() const { return subsurface ? subsurface->parentSurface : nullptr; }
 
 protected:
@@ -162,6 +163,7 @@ public: //member variables
     public:
         Subsurface(QWaylandSurfacePrivate *s) : surface(s) {}
         QWaylandSurfacePrivate *surfaceFromResource();
+        QPoint position() const { return pos; };
 
     protected:
         void subsurface_set_position(wl_subsurface::Resource *resource, int32_t x, int32_t y) override;
@@ -174,7 +176,7 @@ public: //member variables
         friend class QWaylandSurfacePrivate;
         QWaylandSurfacePrivate *surface = nullptr;
         QWaylandSurfacePrivate *parentSurface = nullptr;
-        QPoint position;
+        QPoint pos;
     };
 
     Subsurface *subsurface = nullptr;

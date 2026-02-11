@@ -1078,9 +1078,8 @@ void QWaylandSurfacePrivate::initSubsurface(QWaylandSurface *parent, wl_client *
 void QWaylandSurfacePrivate::Subsurface::subsurface_set_position(wl_subsurface::Resource *resource, int32_t x, int32_t y)
 {
     Q_UNUSED(resource);
-    position = QPoint(x,y);
-    emit surface->q_func()->subsurfacePositionChanged(position);
-
+    pos = QPoint(x,y);
+    emit surface->q_func()->subsurfacePositionChanged(pos);
 }
 
 void QWaylandSurfacePrivate::Subsurface::subsurface_place_above(wl_subsurface::Resource *resource, struct wl_resource *sibling)
