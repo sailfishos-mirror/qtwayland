@@ -650,7 +650,7 @@ QByteArray QWaylandCompositor::socketName() const
 }
 
 /*!
- * \qmlmethod QtWayland.Compositor::WaylandCompositor::addSocketDescriptor(fd)
+ * \qmlmethod void QtWayland.Compositor::WaylandCompositor::addSocketDescriptor(fd)
  * \since 5.12
  *
  * Listen for client connections on a file descriptor, \a fd, referring to a
@@ -713,7 +713,7 @@ QList<QWaylandClient *>QWaylandCompositor::clients() const
 }
 
 /*!
- * \qmlmethod QtWayland.Compositor::WaylandCompositor::destroyClientForSurface(surface)
+ * \qmlmethod void QtWayland.Compositor::WaylandCompositor::destroyClientForSurface(surface)
  *
  * Destroys the client for the WaylandSurface \a surface.
  */
@@ -727,7 +727,7 @@ void QWaylandCompositor::destroyClientForSurface(QWaylandSurface *surface)
 }
 
 /*!
- * \qmlmethod QtWayland.Compositor::WaylandCompositor::destroyClient(client)
+ * \qmlmethod void QtWayland.Compositor::WaylandCompositor::destroyClient(client)
  *
  * Destroys the given WaylandClient \a client.
  */
