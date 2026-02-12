@@ -1047,7 +1047,7 @@ void QWaylandQuickItem::setAllowDiscardFrontBuffer(bool discard)
 }
 
 /*!
- * \qmlmethod WaylandQuickItem::setPrimary()
+ * \qmlmethod void WaylandQuickItem::setPrimary()
  *
  * Makes this WaylandQuickItem the primary view for the surface.
  */
