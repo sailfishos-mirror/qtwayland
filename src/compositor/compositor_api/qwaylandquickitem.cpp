@@ -377,6 +377,18 @@ public:
 
     ~QWaylandSurfaceTextureProvider() override
     {
+        // Note: If the ClientBuffer is deleted from the render thread, it happens on a deferred delete
+        // which is processed during the sync phase. Or it may be deleted from the main thread. In
+        // either case, we know the compositor is not shutting down simultaneously. Therefore, we can
+        // safely rely on the value of m_compositorDestroyed to stay the same for the duration of this
+        // destructor.
+        //
+        // Calling setDestroyed() on the buffer will cause it to skip its final sendRelease()
+        // on destruction, which would otherwise cause a crash when the compositor has been
+        // destroyed.
+        if (m_compositorDestroyed.loadAcquire() && m_ref.hasBuffer())
+            m_ref.buffer()->setDestroyed();
+
         delete m_sgTex;
     }
 
@@ -417,9 +429,18 @@ public:
     }
 
     void setSmooth(bool smooth) { m_smooth = smooth; }
+
+    void reportCompositorDestroyed()
+    {
+        m_compositorDestroyed.storeRelease(1);
+        deleteLater();
+    }
+
 private:
     bool m_smooth = false;
     QSGTexture *m_sgTex = nullptr;
+
+    QAtomicInt m_compositorDestroyed;
     QWaylandBufferRef m_ref;
 };
 
@@ -1542,7 +1563,7 @@ QSGNode *QWaylandQuickItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDat
                             [this](QObject*) {
                                     auto *itemPriv = QWaylandQuickItemPrivate::get(this);
                                     if (itemPriv->provider) {
-                                        itemPriv->provider->deleteLater();
+                                        itemPriv->provider->reportCompositorDestroyed();
                                         itemPriv->provider = nullptr;
                                     }
                                     disconnect(itemPriv->texProviderConnection); }

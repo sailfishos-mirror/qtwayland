@@ -18,6 +18,7 @@ struct wl_resource;
 QT_BEGIN_NAMESPACE
 
 class QOpenGLTexture;
+class QWaylandSurfaceTextureProvider;
 
 namespace QtWayland
 {
@@ -82,6 +83,7 @@ private:
     class QWaylandBufferRefPrivate *const d;
     friend class QWaylandBufferRefPrivate;
     friend class QWaylandSurfacePrivate;
+    friend class QWaylandSurfaceTextureProvider;
 
     friend Q_WAYLANDCOMPOSITOR_EXPORT
     bool operator==(const QWaylandBufferRef &lhs, const QWaylandBufferRef &rhs) noexcept;

@@ -29,6 +29,7 @@
 
 QT_BEGIN_NAMESPACE
 
+class QWaylandSurfaceTextureProvider;
 class QWaylandClientBufferIntegration;
 class QWaylandBufferRef;
 class QWaylandCompositor;
@@ -93,6 +94,7 @@ private:
 
     friend class ::QWaylandBufferRef;
     friend class BufferManager;
+    friend class ::QWaylandSurfaceTextureProvider;
 };
 
 class Q_WAYLANDCOMPOSITOR_EXPORT SharedMemoryBuffer : public ClientBuffer
