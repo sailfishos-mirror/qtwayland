@@ -1,10 +1,10 @@
-// Copyright (C) 2018 The Qt Company Ltd.
+// Copyright (C) 2026 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef LINUXDMABUF_H
 #define LINUXDMABUF_H
 
-#include "qwayland-server-linux-dmabuf-unstable-v1.h"
+#include "qwayland-server-linux-dmabuf-v1.h"
 
 #include <QtWaylandCompositor/private/qwayland-server-wayland.h>
 #include <QtWaylandCompositor/private/qwlclientbufferintegration_p.h>
@@ -14,6 +14,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QSize>
 #include <QtCore/QTextStream>
+#include <QtCore/QTemporaryFile>
 
 #include <array>
 #include <QtGui/QOpenGLContext>
@@ -36,6 +37,10 @@
 #define DRM_FORMAT_MOD_INVALID  fourcc_mod_code(NONE, DRM_FORMAT_RESERVED)
 #endif
 
+#ifndef EGL_DRM_RENDER_NODE_FILE_EXT
+#  define EGL_DRM_RENDER_NODE_FILE_EXT 0x3377
+#endif
+
 // Copied from eglmesaext.h
 #ifndef EGL_WL_bind_wayland_display
 typedef EGLBoolean (EGLAPIENTRYP PFNEGLBINDWAYLANDDISPLAYWL) (EGLDisplay dpy, struct wl_display *display);
@@ -47,6 +52,7 @@ QT_BEGIN_NAMESPACE
 class QWaylandCompositor;
 class QWaylandResource;
 class LinuxDmabufParams;
+class LinuxDmabufFeedback;
 class LinuxDmabufClientBufferIntegration;
 
 struct Plane {
@@ -59,17 +65,47 @@ struct Plane {
 class LinuxDmabuf : public QtWaylandServer::zwp_linux_dmabuf_v1
 {
 public:
-    explicit LinuxDmabuf(wl_display *display, LinuxDmabufClientBufferIntegration *clientBufferIntegration);
+    explicit LinuxDmabuf(int version,
+                         wl_display *display,
+                         LinuxDmabufClientBufferIntegration *clientBufferIntegration);
 
     void setSupportedModifiers(const QHash<uint32_t, QList<uint64_t>> &modifiers);
+    void setDrmDevice(const char *drmDevice);
 
 protected:
     void zwp_linux_dmabuf_v1_bind_resource(Resource *resource) override;
     void zwp_linux_dmabuf_v1_create_params(Resource *resource, uint32_t params_id) override;
+    void zwp_linux_dmabuf_v1_get_default_feedback(Resource *resource, uint32_t id) override;
+    void zwp_linux_dmabuf_v1_get_surface_feedback(Resource *resource, uint32_t id, struct ::wl_resource *surface) override;
 
 private:
     QHash<uint32_t, QList<uint64_t>> m_modifiers; // key=DRM format, value=supported DRM modifiers for format
+    LinuxDmabufClientBufferIntegration *m_clientBufferIntegration = nullptr;
+    const char *m_drmDevice = nullptr;
+};
+
+class LinuxDmabufFeedback : public QtWaylandServer::zwp_linux_dmabuf_feedback_v1
+{
+public:
+    explicit LinuxDmabufFeedback(QHash<uint32_t, QList<uint64_t>> modifiers,
+                                 const char *drmDevice,
+                                 LinuxDmabufClientBufferIntegration *clientBufferIntegration,
+                                 wl_resource *resource);
+    ~LinuxDmabufFeedback() override;
+
+protected:
+    void zwp_linux_dmabuf_feedback_v1_bind_resource(Resource *resource) override;
+    void zwp_linux_dmabuf_feedback_v1_destroy_resource(Resource *resource) override;
+    void zwp_linux_dmabuf_feedback_v1_destroy(Resource *resource) override;
+
+private:
+    QByteArray sendFormatTable(Resource *resource);
+    void sendFeedback(Resource *resource);
+    QHash<uint32_t, QList<uint64_t>> m_modifiers;
+    const char *m_drmDevice;
     LinuxDmabufClientBufferIntegration *m_clientBufferIntegration;
+    uchar *m_data = nullptr;
+    qsizetype m_size = 0;
 };
 
 class LinuxDmabufParams : public QtWaylandServer::zwp_linux_buffer_params_v1

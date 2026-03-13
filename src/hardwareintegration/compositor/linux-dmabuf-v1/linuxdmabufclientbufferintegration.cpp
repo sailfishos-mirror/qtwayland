@@ -216,7 +216,8 @@ bool LinuxDmabufClientBufferIntegration::initYuvTexture(LinuxDmabufWlBuffer *dma
     return success;
 }
 
-LinuxDmabufClientBufferIntegration::LinuxDmabufClientBufferIntegration()
+LinuxDmabufClientBufferIntegration::LinuxDmabufClientBufferIntegration(bool useLegacyVersion)
+    : m_useLegacyVersion(useLegacyVersion)
 {
     YuvPlaneConversion firstPlane;
     firstPlane.format = DRM_FORMAT_GR88;
@@ -243,18 +244,20 @@ LinuxDmabufClientBufferIntegration::~LinuxDmabufClientBufferIntegration()
 {
     m_importedBuffers.clear();
 
-    if (egl_unbind_wayland_display != nullptr && m_displayBound) {
-        Q_ASSERT(m_wlDisplay != nullptr);
-        if (!egl_unbind_wayland_display(m_eglDisplay, m_wlDisplay))
-            qCWarning(qLcWaylandCompositorHardwareIntegration) << "eglUnbindWaylandDisplayWL failed";
+    if (m_useLegacyVersion) {
+        if (egl_unbind_wayland_display != nullptr && m_displayBound) {
+            Q_ASSERT(m_wlDisplay != nullptr);
+            if (!egl_unbind_wayland_display(m_eglDisplay, m_wlDisplay))
+                qCWarning(qLcWaylandCompositorHardwareIntegration)
+                    << "eglUnbindWaylandDisplayWL failed";
+        }
     }
 }
 
 void LinuxDmabufClientBufferIntegration::initializeHardware(struct ::wl_display *display)
 {
-    m_linuxDmabuf.reset(new LinuxDmabuf(display, this));
-
-    const bool ignoreBindDisplay = !qgetenv("QT_WAYLAND_IGNORE_BIND_DISPLAY").isEmpty() && qgetenv("QT_WAYLAND_IGNORE_BIND_DISPLAY").toInt() != 0;
+    const int version = m_useLegacyVersion ? 3 : 4;
+    m_linuxDmabuf.reset(new LinuxDmabuf(version, display, this));
 
     // initialize hardware extensions
     egl_query_dmabuf_modifiers_ext = reinterpret_cast<PFNEGLQUERYDMABUFMODIFIERSEXTPROC>(eglGetProcAddress("eglQueryDmaBufModifiersEXT"));
@@ -264,11 +267,22 @@ void LinuxDmabufClientBufferIntegration::initializeHardware(struct ::wl_display 
         return;
     }
 
-    egl_bind_wayland_display = reinterpret_cast<PFNEGLBINDWAYLANDDISPLAYWL>(eglGetProcAddress("eglBindWaylandDisplayWL"));
-    egl_unbind_wayland_display = reinterpret_cast<PFNEGLUNBINDWAYLANDDISPLAYWL>(eglGetProcAddress("eglUnbindWaylandDisplayWL"));
-    if ((!egl_bind_wayland_display || !egl_unbind_wayland_display) && !ignoreBindDisplay) {
-        qCWarning(qLcWaylandCompositorHardwareIntegration) << "Failed to initialize EGL display. Could not find eglBindWaylandDisplayWL and eglUnbindWaylandDisplayWL.";
-        return;
+    if (m_useLegacyVersion) {
+        const bool ignoreBindDisplay = !qgetenv("QT_WAYLAND_IGNORE_BIND_DISPLAY").isEmpty() && qgetenv("QT_WAYLAND_IGNORE_BIND_DISPLAY").toInt() != 0;
+
+        egl_bind_wayland_display = reinterpret_cast<PFNEGLBINDWAYLANDDISPLAYWL>(eglGetProcAddress("eglBindWaylandDisplayWL"));
+        egl_unbind_wayland_display = reinterpret_cast<PFNEGLUNBINDWAYLANDDISPLAYWL>(eglGetProcAddress("eglUnbindWaylandDisplayWL"));
+        if ((!egl_bind_wayland_display || !egl_unbind_wayland_display) && !ignoreBindDisplay) {
+            qCWarning(qLcWaylandCompositorHardwareIntegration) << "Failed to initialize EGL display. Could not find eglBindWaylandDisplayWL and eglUnbindWaylandDisplayWL.";
+            return;
+        }
+    } else {
+        egl_query_display_attrib = reinterpret_cast<PFNEGLQUERYDISPLAYATTRIBEXTPROC>(eglGetProcAddress("eglQueryDisplayAttribEXT"));
+        egl_query_device_string = reinterpret_cast<PFNEGLQUERYDEVICESTRINGEXTPROC>(eglGetProcAddress("eglQueryDeviceStringEXT"));
+        if (!egl_query_display_attrib || !egl_query_device_string) {
+            qCWarning(qLcWaylandCompositorHardwareIntegration) << "Failed to initialize linux-dmabuf extension. Could not find required function eglQueryDisplayAttribEXT() or eglQueryDeviceStringEXT().";
+            return;
+        }
     }
 
     egl_create_image = reinterpret_cast<PFNEGLCREATEIMAGEKHRPROC>(eglGetProcAddress("eglCreateImageKHR"));
@@ -299,7 +313,7 @@ void LinuxDmabufClientBufferIntegration::initializeHardware(struct ::wl_display 
     if (strstr(extensionString, "EGL_EXT_image_dma_buf_import_modifiers"))
         m_supportsDmabufModifiers = true;
 
-    if (egl_bind_wayland_display && egl_unbind_wayland_display) {
+    if (m_useLegacyVersion && egl_bind_wayland_display && egl_unbind_wayland_display) {
         m_displayBound = egl_bind_wayland_display(m_eglDisplay, display);
         if (!m_displayBound)
             qCDebug(qLcWaylandCompositorHardwareIntegration) << "Wayland display already bound by other client buffer integration.";
@@ -312,6 +326,28 @@ void LinuxDmabufClientBufferIntegration::initializeHardware(struct ::wl_display 
         modifiers[format] = supportedDrmModifiers(format);
     }
     m_linuxDmabuf->setSupportedModifiers(modifiers);
+    m_linuxDmabuf->setDrmDevice(drmDevice());
+}
+
+const char *LinuxDmabufClientBufferIntegration::drmDevice() const
+{
+    if (!egl_query_device_string || !egl_query_display_attrib)
+        return nullptr;
+
+    EGLAttrib attrib;
+    if (!egl_query_display_attrib(m_eglDisplay, EGL_DEVICE_EXT, &attrib)) {
+        qCWarning(qLcWaylandCompositorHardwareIntegration) << "Failed to query EGL device";
+        return nullptr;
+    }
+
+    EGLDeviceEXT eglDevice = reinterpret_cast<EGLDeviceEXT>(attrib);
+    const char *ret = egl_query_device_string(eglDevice, EGL_DRM_RENDER_NODE_FILE_EXT);
+    if (!ret)
+        ret = egl_query_device_string(eglDevice, EGL_DRM_DEVICE_FILE_EXT);
+    if (!ret)
+        qCWarning(qLcWaylandCompositorHardwareIntegration) << "Failed to query DRM device";
+
+    return ret;
 }
 
 QList<uint32_t> LinuxDmabufClientBufferIntegration::supportedDrmFormats()

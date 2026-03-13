@@ -10,8 +10,8 @@ qt_internal_get_wayland_protocols_dir(protocols_dir)
 
 qt_find_package(EGL)
 
-qt_internal_add_plugin(QWaylandDmabufUnstableClientBufferIntegrationPlugin
-    OUTPUT_NAME qt-wayland-compositor-linux-dmabuf-unstable-v1
+qt_internal_add_plugin(QWaylandDmabufClientBufferIntegrationPlugin
+    OUTPUT_NAME qt-wayland-compositor-linux-dmabuf-v1
     PLUGIN_TYPE wayland-graphics-integration-server
     SOURCES
         ../../../../hardwareintegration/compositor/linux-dmabuf-v1/linuxdmabuf.cpp ../../../../hardwareintegration/compositor/linux-dmabuf-v1/linuxdmabuf.h
@@ -31,7 +31,7 @@ qt_internal_add_plugin(QWaylandDmabufUnstableClientBufferIntegrationPlugin
         ${protocols_dir}/linux-dmabuf
 )
 
-qt6_generate_wayland_protocol_server_sources(QWaylandDmabufUnstableClientBufferIntegrationPlugin
+qt6_generate_wayland_protocol_server_sources(QWaylandDmabufClientBufferIntegrationPlugin
     PRIVATE_CODE
     FILES
         ${protocols_dir}/linux-dmabuf/linux-dmabuf-v1.xml

@@ -4,19 +4,53 @@
 #include "linuxdmabuf.h"
 #include "linuxdmabufclientbufferintegration.h"
 
+#include <QtCore/QStandardPaths>
+
 #include <QtWaylandCompositor/QWaylandCompositor>
 #include <QtWaylandCompositor/private/qwltextureorphanage_p.h>
 
 #include <drm_fourcc.h>
 #include <drm_mode.h>
 #include <unistd.h>
+#include <sys/stat.h>
+
+#include <fcntl.h>
+#include <sys/mman.h>
+
+#ifdef Q_OS_LINUX
+#  include <sys/syscall.h>
+// from linux/memfd.h:
+#  ifndef MFD_CLOEXEC
+#    define MFD_CLOEXEC     0x0001U
+#  endif
+#  ifndef MFD_ALLOW_SEALING
+#    define MFD_ALLOW_SEALING 0x0002U
+#  endif
+// from bits/fcntl-linux.h
+#  ifndef F_ADD_SEALS
+#    define F_ADD_SEALS 1033
+#  endif
+#  ifndef F_SEAL_SEAL
+#    define F_SEAL_SEAL 0x0001
+#  endif
+#  ifndef F_SEAL_SHRINK
+#    define F_SEAL_SHRINK 0x0002
+#  endif
+#endif
 
 QT_BEGIN_NAMESPACE
 
-LinuxDmabuf::LinuxDmabuf(wl_display *display, LinuxDmabufClientBufferIntegration *clientBufferIntegration)
-    : zwp_linux_dmabuf_v1(display, 3 /*version*/)
+LinuxDmabuf::LinuxDmabuf(int version,
+                         wl_display *display,
+                         LinuxDmabufClientBufferIntegration *clientBufferIntegration)
+    : zwp_linux_dmabuf_v1(display, version)
     , m_clientBufferIntegration(clientBufferIntegration)
 {
+}
+
+void LinuxDmabuf::setDrmDevice(const char *drmDevice)
+{
+    m_drmDevice = drmDevice;
 }
 
 void LinuxDmabuf::setSupportedModifiers(const QHash<uint32_t, QList<uint64_t>> &modifiers)
@@ -27,6 +61,9 @@ void LinuxDmabuf::setSupportedModifiers(const QHash<uint32_t, QList<uint64_t>> &
 
 void LinuxDmabuf::zwp_linux_dmabuf_v1_bind_resource(Resource *resource)
 {
+    if (resource->version() >= ZWP_LINUX_DMABUF_V1_GET_SURFACE_FEEDBACK_SINCE_VERSION)
+        return;
+
     for (auto it = m_modifiers.constBegin(); it != m_modifiers.constEnd(); ++it) {
         auto format = it.key();
         auto modifiers = it.value();
@@ -50,6 +87,177 @@ void LinuxDmabuf::zwp_linux_dmabuf_v1_create_params(Resource *resource, uint32_t
     wl_resource *r = wl_resource_create(resource->client(), &zwp_linux_buffer_params_v1_interface,
                                         wl_resource_get_version(resource->handle), params_id);
     new LinuxDmabufParams(m_clientBufferIntegration, r); // deleted by the client, or when it disconnects
+}
+
+void LinuxDmabuf::zwp_linux_dmabuf_v1_get_default_feedback(Resource *resource, uint32_t id)
+{
+    if (resource->version() < ZWP_LINUX_DMABUF_V1_GET_DEFAULT_FEEDBACK_SINCE_VERSION)
+        return;
+
+    wl_resource *r = wl_resource_create(resource->client(),
+                                        &zwp_linux_dmabuf_feedback_v1_interface,
+                                        wl_resource_get_version(resource->handle),
+                                        id);
+    // Deleted by client
+    new LinuxDmabufFeedback(m_modifiers, m_drmDevice, m_clientBufferIntegration, r);
+}
+
+void LinuxDmabuf::zwp_linux_dmabuf_v1_get_surface_feedback(Resource *resource, uint32_t id, struct ::wl_resource *surface)
+{
+    if (resource->version() < ZWP_LINUX_DMABUF_V1_GET_SURFACE_FEEDBACK_SINCE_VERSION)
+        return;
+
+    Q_UNUSED(surface);
+    wl_resource *r = wl_resource_create(resource->client(),
+                                        &zwp_linux_dmabuf_feedback_v1_interface,
+                                        wl_resource_get_version(resource->handle),
+                                        id);
+    // Deleted by client
+    new LinuxDmabufFeedback(m_modifiers, m_drmDevice, m_clientBufferIntegration, r);
+}
+
+LinuxDmabufFeedback::LinuxDmabufFeedback(QHash<uint32_t, QList<uint64_t>> modifiers,
+                                         const char *drmDevice,
+                                         LinuxDmabufClientBufferIntegration *clientBufferIntegration,
+                                         wl_resource *res)
+    : zwp_linux_dmabuf_feedback_v1(res)
+    , m_modifiers(modifiers)
+    , m_drmDevice(drmDevice)
+    , m_clientBufferIntegration(clientBufferIntegration)
+{
+    sendFeedback(resource());
+}
+
+LinuxDmabufFeedback::~LinuxDmabufFeedback()
+{
+    if (m_data)
+        munmap(m_data, m_size);
+}
+
+void LinuxDmabufFeedback::zwp_linux_dmabuf_feedback_v1_destroy(Resource *resource)
+{
+    wl_resource_destroy(resource->handle);
+}
+
+void LinuxDmabufFeedback::zwp_linux_dmabuf_feedback_v1_destroy_resource(Resource *resource)
+{
+    Q_UNUSED(resource);
+    delete this;
+}
+
+void LinuxDmabufFeedback::zwp_linux_dmabuf_feedback_v1_bind_resource(Resource *resource)
+{
+    sendFeedback(resource);
+}
+
+QByteArray LinuxDmabufFeedback::sendFormatTable(Resource *)
+{
+    QList<std::pair<uint32_t, uint64_t> > formatModifierPairs;
+    for (auto it = m_modifiers.constBegin(); it != m_modifiers.constEnd(); ++it) {
+        uint32_t format = it.key();
+        QList<uint64_t> modifiers = it.value();
+
+        if (!modifiers.isEmpty()) {
+            for (uint64_t modifier : modifiers)
+                formatModifierPairs.append(std::make_pair(format, modifier));
+        } else {
+            formatModifierPairs.append(std::make_pair(format, DRM_FORMAT_MOD_INVALID));
+        }
+    }
+
+    if (formatModifierPairs.isEmpty()) {
+        qCWarning(qLcWaylandCompositorHardwareIntegration) << "LinuxDmabufFeedback: No formats";
+        return QByteArray{};
+    }
+
+    int fd = -1;
+#ifdef SYS_memfd_create
+    fd = syscall(SYS_memfd_create, "wayland-dmabuf", MFD_CLOEXEC | MFD_ALLOW_SEALING);
+    if (fd >= 0)
+        fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_SEAL);
+#endif
+
+    std::unique_ptr<QFile> filePointer;
+    if (fd == -1) {
+        auto tmpFile =
+            std::make_unique<QTemporaryFile>(QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation) +
+                                             QLatin1String("/wayland-dmabuf-XXXXXX"));
+        if (tmpFile->open())
+            filePointer = std::move(tmpFile);
+    } else {
+        auto file = std::make_unique<QFile>();
+        if (file->open(fd, QIODevice::ReadWrite | QIODevice::Unbuffered, QFile::AutoCloseHandle))
+            filePointer = std::move(file);
+    }
+
+    m_size = formatModifierPairs.size() * 16;
+    if (!filePointer || !filePointer->resize(m_size)) {
+        qCWarning(qLcWaylandCompositorHardwareIntegration)
+            << "LinuxDmabufFeedback: failed: " << filePointer->errorString();
+        return QByteArray{};
+    }
+
+    fd = filePointer->handle();
+
+    if (m_data)
+        munmap(m_data, m_size);
+    m_data = (uchar *) mmap(nullptr, m_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+
+    QByteArray indicesArray;
+    indicesArray.resize(formatModifierPairs.size() * 2); // Each index is 2 bytes
+    char *iptr = indicesArray.data();
+
+    // Copy data into array with native endianness
+    for (quint16 i = 0; i < quint16(formatModifierPairs.size()); ++i) {
+        memcpy(iptr, &i, 2);
+        iptr += 2;
+
+        const auto &formatModifierPair = formatModifierPairs.at(i);
+        uint32_t format = formatModifierPair.first;
+        uint64_t modifiers = formatModifierPair.second;
+        memcpy(m_data, &format, 4);
+        m_data += 4;
+
+        m_data += 4; // Padding
+
+        memcpy(m_data, &modifiers, 8);
+        m_data += 8;
+    }
+
+    send_format_table(fd, m_size);
+
+    // Returns indices for convenience
+    return indicesArray;
+}
+
+void LinuxDmabufFeedback::sendFeedback(Resource *resource)
+{
+    if (!m_drmDevice)
+        return;
+
+    QByteArray indices = sendFormatTable(resource);
+
+    // Query main device by getting the device number of the drm device,
+    // granted its still there.
+    struct stat drmDeviceStat;
+    if (stat(m_drmDevice, &drmDeviceStat)) {
+        qCWarning(qLcWaylandCompositorHardwareIntegration)
+            << "Failed to access DRM device in linux-dmabuf-feedback";
+        return;
+    }
+
+    dev_t mainDevice = drmDeviceStat.st_rdev;
+    QByteArray mainDeviceArray;
+    mainDeviceArray.setRawData(reinterpret_cast<const char *>(&mainDevice), sizeof(dev_t));
+    send_main_device(mainDeviceArray);
+
+    // At least one tranche required, we just send one with all formats
+    send_tranche_target_device(mainDeviceArray);
+    send_tranche_flags(0);
+    send_tranche_formats(indices);
+    send_tranche_done();
+
+    send_done();
 }
 
 LinuxDmabufParams::LinuxDmabufParams(LinuxDmabufClientBufferIntegration *clientBufferIntegration, wl_resource *resource)

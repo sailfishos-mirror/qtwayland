@@ -415,6 +415,14 @@ void QWaylandCompositorPrivate::loadClientBufferIntegration()
             targetKeys.append(s);
     }
 
+    if (!clientBufferIntegration.isEmpty() && targetKeys.isEmpty()) {
+        qCWarning(qLcWaylandCompositorHardwareIntegration)
+            << "Failed to find any requested client buffer integration:"
+            << clientBufferIntegration
+            << ", available integrations:"
+            << keys;
+    }
+
     if (targetKeys.isEmpty()) {
         if (keys.contains(QString::fromLatin1("wayland-egl"))) {
             targetKeys.append(QString::fromLatin1("wayland-egl"));

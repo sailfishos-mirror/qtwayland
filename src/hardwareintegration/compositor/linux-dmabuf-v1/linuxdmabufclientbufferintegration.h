@@ -39,7 +39,7 @@ struct YuvFormatConversion {
 class LinuxDmabufClientBufferIntegration : public QtWayland::ClientBufferIntegration
 {
 public:
-    LinuxDmabufClientBufferIntegration();
+    LinuxDmabufClientBufferIntegration(bool useLegacyVersion = false);
     ~LinuxDmabufClientBufferIntegration() override;
 
     void initializeHardware(struct ::wl_display *display) override;
@@ -52,8 +52,16 @@ public:
 private:
     Q_DISABLE_COPY(LinuxDmabufClientBufferIntegration)
 
+    bool m_useLegacyVersion;
+
     PFNEGLBINDWAYLANDDISPLAYWL egl_bind_wayland_display = nullptr;
     PFNEGLUNBINDWAYLANDDISPLAYWL egl_unbind_wayland_display = nullptr;
+    ::wl_display *m_wlDisplay = nullptr;
+    bool m_displayBound = false;
+
+    PFNEGLQUERYDISPLAYATTRIBEXTPROC egl_query_display_attrib = nullptr;
+    PFNEGLQUERYDEVICESTRINGEXTPROC egl_query_device_string = nullptr;
+
     PFNEGLCREATEIMAGEKHRPROC egl_create_image = nullptr;
     PFNEGLDESTROYIMAGEKHRPROC egl_destroy_image = nullptr;
     PFNEGLQUERYDMABUFMODIFIERSEXTPROC egl_query_dmabuf_modifiers_ext = nullptr;
@@ -63,10 +71,9 @@ private:
     bool initYuvTexture(LinuxDmabufWlBuffer *dmabufBuffer);
     QList<uint32_t> supportedDrmFormats();
     QList<uint64_t> supportedDrmModifiers(uint32_t format);
+    const char *drmDevice() const;
 
     EGLDisplay m_eglDisplay = EGL_NO_DISPLAY;
-    ::wl_display *m_wlDisplay = nullptr;
-    bool m_displayBound = false;
 
     QHash<EGLint, YuvFormatConversion> m_yuvFormats;
     bool m_supportsDmabufModifiers = false;
