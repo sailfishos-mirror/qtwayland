@@ -19,9 +19,19 @@ QWaylandQuickOutput::QWaylandQuickOutput(QWaylandCompositor *compositor, QWindow
 
 void QWaylandQuickOutput::initialize()
 {
+    QWindow *win = window();
+    if (win != nullptr) {
+        QWaylandOutputMode mode(win->size() * win->devicePixelRatio(),
+                                qFloor(win->screen()->refreshRate() * 1000));
+        if (mode.isValid()) {
+            addMode(mode, true);
+            setCurrentMode(mode);
+        }
+    }
+
     QWaylandOutput::initialize();
 
-    QQuickWindow *quickWindow = qobject_cast<QQuickWindow *>(window());
+    QQuickWindow *quickWindow = qobject_cast<QQuickWindow *>(win);
     if (!quickWindow) {
         qWarning("Initialization error: Could not locate QQuickWindow on initializing QWaylandQuickOutput %p.\n", this);
         return;
