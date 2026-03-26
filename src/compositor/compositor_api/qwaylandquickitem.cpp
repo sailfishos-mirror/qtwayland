@@ -1556,20 +1556,15 @@ QSGNode *QWaylandQuickItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDat
 
         if (!d->provider) {
             d->provider = new QWaylandSurfaceTextureProvider();
-            if (compositor()) {
+            if (auto *c = compositor()) {
                 d->texProviderConnection =
-                    QObject::connect(
-                            compositor(),
-                            &QObject::destroyed,
-                            this,
-                            [this](QObject*) {
-                                    auto *itemPriv = QWaylandQuickItemPrivate::get(this);
-                                    if (itemPriv->provider) {
-                                        itemPriv->provider->reportCompositorDestroyed();
-                                        itemPriv->provider = nullptr;
-                                    }
-                                    disconnect(itemPriv->texProviderConnection); }
-                    );
+                    QObject::connect(c, &QObject::destroyed, this, [d = d] {
+                        if (d->provider) {
+                            d->provider->reportCompositorDestroyed();
+                            d->provider = nullptr;
+                        }
+                        QObject::disconnect(d->texProviderConnection);
+                    });
             }
         }
 
