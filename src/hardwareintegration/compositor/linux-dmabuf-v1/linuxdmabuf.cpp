@@ -99,7 +99,7 @@ void LinuxDmabuf::zwp_linux_dmabuf_v1_get_default_feedback(Resource *resource, u
                                         wl_resource_get_version(resource->handle),
                                         id);
     // Deleted by client
-    new LinuxDmabufFeedback(m_modifiers, m_drmDevice, m_clientBufferIntegration, r);
+    new LinuxDmabufFeedback(m_modifiers, m_drmDevice, r);
 }
 
 void LinuxDmabuf::zwp_linux_dmabuf_v1_get_surface_feedback(Resource *resource, uint32_t id, struct ::wl_resource *surface)
@@ -113,17 +113,14 @@ void LinuxDmabuf::zwp_linux_dmabuf_v1_get_surface_feedback(Resource *resource, u
                                         wl_resource_get_version(resource->handle),
                                         id);
     // Deleted by client
-    new LinuxDmabufFeedback(m_modifiers, m_drmDevice, m_clientBufferIntegration, r);
+    new LinuxDmabufFeedback(m_modifiers, m_drmDevice, r);
 }
 
 LinuxDmabufFeedback::LinuxDmabufFeedback(QHash<uint32_t, QList<uint64_t>> modifiers,
-                                         const char *drmDevice,
-                                         LinuxDmabufClientBufferIntegration *clientBufferIntegration,
-                                         wl_resource *res)
+                                         const char *drmDevice, wl_resource *res)
     : zwp_linux_dmabuf_feedback_v1(res)
     , m_modifiers(modifiers)
     , m_drmDevice(drmDevice)
-    , m_clientBufferIntegration(clientBufferIntegration)
 {
     sendFeedback(resource());
 }

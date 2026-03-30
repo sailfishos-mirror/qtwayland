@@ -87,9 +87,7 @@ private:
 class LinuxDmabufFeedback : public QtWaylandServer::zwp_linux_dmabuf_feedback_v1
 {
 public:
-    explicit LinuxDmabufFeedback(QHash<uint32_t, QList<uint64_t>> modifiers,
-                                 const char *drmDevice,
-                                 LinuxDmabufClientBufferIntegration *clientBufferIntegration,
+    explicit LinuxDmabufFeedback(QHash<uint32_t, QList<uint64_t>> modifiers, const char *drmDevice,
                                  wl_resource *resource);
     ~LinuxDmabufFeedback() override;
 
@@ -103,7 +101,6 @@ private:
     void sendFeedback(Resource *resource);
     QHash<uint32_t, QList<uint64_t>> m_modifiers;
     const char *m_drmDevice;
-    LinuxDmabufClientBufferIntegration *m_clientBufferIntegration;
     uchar *m_data = nullptr;
     qsizetype m_size = 0;
 };
