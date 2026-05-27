@@ -31,6 +31,8 @@
 #include <QtCore/QDebug>
 #include <QtCore/QThread>
 
+#include <QtCore/private/qthread_p.h>
+
 #include <QtWaylandClient/private/qwayland-fractional-scale-v1.h>
 
 QT_BEGIN_NAMESPACE
@@ -942,6 +944,8 @@ void QWaylandWindow::setWindowFlags(Qt::WindowFlags flags)
 
 bool QWaylandWindow::createDecoration()
 {
+    Q_ASSERT_X(QThread::currentThreadId() == QThreadData::get2(thread())->threadId.loadRelaxed(),
+               "QWaylandWindow::createDecoration", "not called from main thread");
     if (!mDisplay->supportsWindowDecoration())
         return false;
 
@@ -1022,11 +1026,7 @@ bool QWaylandWindow::createDecoration()
         // size and are not redrawn, leaving the new buffer empty. As a simple
         // work-around, we trigger a full extra update whenever the client-side
         // window decorations are toggled while the window is showing.
-        // Note: createDecoration() is sometimes called from the render thread
-        // of Qt Quick. This is essentially wrong and could potentially cause problems,
-        // but until the underlying issue has been fixed, we have to use invokeMethod()
-        // here to avoid asserts.
-        QMetaObject::invokeMethod(window(), &QWindow::requestUpdate);
+        window()->requestUpdate();
     }
 
     return mWindowDecoration;
@@ -1466,12 +1466,13 @@ void QWaylandWindow::timerEvent(QTimerEvent *event)
     {
         QMutexLocker lock(&mFrameSyncMutex);
 
-        bool callbackTimerExpired = mFrameCallbackElapsedTimer.hasExpired(mFrameCallbackTimeout);
-        if (!mFrameCallbackElapsedTimer.isValid() || callbackTimerExpired ) {
+        const bool callbackTimerValid = mFrameCallbackElapsedTimer.isValid();
+        const bool callbackTimerExpired = callbackTimerValid && mFrameCallbackElapsedTimer.hasExpired(mFrameCallbackTimeout);
+        if (!callbackTimerValid || callbackTimerExpired) {
             killTimer(mFrameCallbackCheckIntervalTimerId);
             mFrameCallbackCheckIntervalTimerId = -1;
         }
-        if (!mFrameCallbackElapsedTimer.isValid() || !callbackTimerExpired) {
+        if (!callbackTimerValid || !callbackTimerExpired) {
             return;
         }
         mFrameCallbackElapsedTimer.invalidate();
@@ -1629,6 +1630,18 @@ void QWaylandWindow::closeChildPopups() {
         popup->reset();
     }
 }
+
+bool QWaylandWindow::windowEvent(QEvent *event)
+{
+    if (event->type() == QEvent::ApplicationPaletteChange
+        || event->type() == QEvent::ApplicationFontChange) {
+        if (mWindowDecorationEnabled && window()->isVisible())
+            mWindowDecoration->update();
+    }
+
+    return QPlatformWindow::windowEvent(event);
+}
+
 }
 
 QT_END_NAMESPACE
