@@ -80,7 +80,7 @@ void QWaylandOutputPrivate::output_bind_resource(Resource *resource)
 {
     sendGeometry(resource);
 
-    for (const QWaylandOutputMode &mode : modes)
+    for (const QWaylandOutputMode &mode : std::as_const(modes))
         sendMode(resource, mode);
 
     maybeSendScale(resource, scaleFactor);
@@ -119,7 +119,8 @@ void QWaylandOutputPrivate::sendGeometry(const Resource *resource)
 
 void QWaylandOutputPrivate::sendGeometryInfo()
 {
-    for (const Resource *resource : resourceMap().values()) {
+    const auto resources = resourceMap().values();
+    for (const Resource *resource : resources) {
         sendGeometry(resource);
         maybeSendDone(resource);
     }
@@ -140,8 +141,9 @@ void QWaylandOutputPrivate::sendMode(const Resource *resource, const QWaylandOut
 
 void QWaylandOutputPrivate::sendModesInfo()
 {
-    for (const Resource *resource : resourceMap().values()) {
-        for (const QWaylandOutputMode &mode : modes)
+    const auto resources = resourceMap().values();
+    for (const Resource *resource : resources) {
+        for (const QWaylandOutputMode &mode : std::as_const(modes))
             sendMode(resource, mode);
         maybeSendDone(resource);
     }

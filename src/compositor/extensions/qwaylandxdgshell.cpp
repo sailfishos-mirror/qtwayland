@@ -1319,7 +1319,7 @@ void QWaylandXdgToplevelPrivate::handleAckConfigure(uint serial)
 
     m_lastAckedConfigure = config;
 
-    for (uint state : changedStates) {
+    for (uint state : std::as_const(changedStates)) {
         switch (state) {
         case state_maximized:
             emit q->maximizedChanged();
