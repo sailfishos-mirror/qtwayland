@@ -229,6 +229,8 @@ public:
     void removeChildPopup(QWaylandWindow* child);
     void closeChildPopups();
 
+    bool windowEvent(QEvent *event) override;
+
 public slots:
     void applyConfigure();
 
@@ -277,7 +279,7 @@ protected:
 #endif
 
     WId mWindowId;
-    bool mFrameCallbackTimedOut = false; // Whether the frame callback has timed out
+    std::atomic_bool mFrameCallbackTimedOut = false; // Whether the frame callback has timed out
     int mFrameCallbackCheckIntervalTimerId = -1;
     QAtomicInt mWaitingForUpdateDelivery = false;
 
@@ -288,7 +290,7 @@ protected:
     QWaitCondition mFrameSyncWait;
 
     // True when we have called deliverRequestUpdate, but the client has not yet attached a new buffer
-    bool mWaitingForUpdate = false;
+    std::atomic_bool mWaitingForUpdate = false;
 
     QMutex mResizeLock;
     bool mWaitingToApplyConfigure = false;
