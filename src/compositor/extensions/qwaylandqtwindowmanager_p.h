@@ -39,7 +39,7 @@ protected:
 
 private:
     bool showIsFullScreen = false;
-    QMap<Resource*, QString> urls;
+    QHash<Resource*, QString> urls;
 };
 
 QT_END_NAMESPACE

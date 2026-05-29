@@ -181,7 +181,8 @@ void QWaylandTextInputPrivate::sendKeyEvent(QKeyEvent *event)
         mods |= metaModifierMask;
 
 #if QT_CONFIG(xkbcommon)
-    for (xkb_keysym_t keysym : QXkbCommon::toKeysym(event)) {
+    const auto keysyms = QXkbCommon::toKeysym(event);
+    for (xkb_keysym_t keysym : keysyms) {
         send_keysym(focusResource->handle, event->timestamp(), keysym,
                     event->type() == QEvent::KeyPress ? WL_KEYBOARD_KEY_STATE_PRESSED : WL_KEYBOARD_KEY_STATE_RELEASED,
                     mods);
