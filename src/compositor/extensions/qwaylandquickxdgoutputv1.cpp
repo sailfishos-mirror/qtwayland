@@ -20,7 +20,8 @@ void QWaylandQuickXdgOutputV1::componentComplete()
     if (!manager()) {
         for (auto *p = parent(); p != nullptr; p = p->parent()) {
             if (auto *c = qobject_cast<QWaylandCompositor *>(p)) {
-                for (auto *extension : c->extensions()) {
+                const auto extensions = c->extensions();
+                for (auto *extension : extensions) {
                     if (auto *m = qobject_cast<QWaylandXdgOutputManagerV1 *>(extension)) {
                         QWaylandXdgOutputV1Private::get(this)->setManager(m);
                         break;

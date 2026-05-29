@@ -58,7 +58,8 @@ void QWaylandTextureOrphanage::deleteTextures()
     {
         QMutexLocker locker(&m_containerLock);
 
-        for (QOpenGLContext *aCtx : m_orphanedTextures.keys()) {
+        const auto contexts = m_orphanedTextures.keys();
+        for (QOpenGLContext *aCtx : contexts) {
             if (QOpenGLContext::areSharing(cCtx, aCtx)) {
 
                 qCDebug(qLcWTO) << Q_FUNC_INFO << "currentContext (" << cCtx
@@ -92,7 +93,7 @@ void QWaylandTextureOrphanage::deleteTexturesByContext(QOpenGLContext *ctx)
     // then in a debug-build we will fail below:
     Q_ASSERT(!m_containerLock.tryLock());
 
-    QList<QOpenGLTexture *> texturesToDelete = m_orphanedTextures.values(ctx);
+    const QList<QOpenGLTexture *> texturesToDelete = m_orphanedTextures.values(ctx);
     m_orphanedTextures.remove(ctx);
 
     for (QOpenGLTexture *tex : texturesToDelete) {
