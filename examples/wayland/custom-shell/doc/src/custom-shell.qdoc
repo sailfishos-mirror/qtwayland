@@ -137,7 +137,7 @@
  * the building blocks of a \l{Qt Wayland Compositor}.
  *
  * One notable difference in the Custom Shell compositor is the instantiation of the shell
- * extension. Where the \l{Minimal QML}{the Minimal QML example}
+ * extension. Where the \l{Minimal QML}{Minimal QML example}
  * instantiates the shell extensions \l{IviApplication}, \l{XdgShell} and \l{WlShell}, the
  * Custom Shell example only creates an instance of the \c ExampleShell extension.
  *

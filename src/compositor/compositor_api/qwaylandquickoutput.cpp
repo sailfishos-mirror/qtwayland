@@ -72,11 +72,10 @@ void QWaylandQuickOutput::update()
 
 /*!
  * \qmlproperty bool QtWayland.Compositor::WaylandOutput::automaticFrameCallback
+ * \default true
  *
  * This property holds whether the WaylandOutput automatically sends frame
  * callbacks when rendering.
- *
- * The default is true.
  */
 
 /*!
