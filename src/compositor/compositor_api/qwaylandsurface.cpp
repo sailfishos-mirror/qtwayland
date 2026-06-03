@@ -451,7 +451,7 @@ QtWayland::ClientBuffer *QWaylandSurfacePrivate::getBuffer(struct ::wl_resource 
  */
 
 /*!
- * Constructs a an uninitialized QWaylandSurface.
+ * Constructs an uninitialized QWaylandSurface.
  */
 QWaylandSurface::QWaylandSurface()
     : QWaylandObject(*new QWaylandSurfacePrivate())
@@ -556,13 +556,17 @@ QWaylandClient *QWaylandSurface::client() const
 /*!
  * \qmlproperty bool QtWayland.Compositor::WaylandSurface::hasContent
  *
- * This property holds whether the WaylandSurface has content.
+ * This property holds whether the surface currently has a committed, non-null buffer.
+ *
+ * \sa WaylandSurface::bufferSize
  */
 
 /*!
  * \property QWaylandSurface::hasContent
  *
- * This property holds whether the QWaylandSurface has content.
+ * This property holds whether the surface currently has a committed, non-null buffer.
+ *
+ * \sa QWaylandSurface::bufferSize
  */
 bool QWaylandSurface::hasContent() const
 {
@@ -1130,7 +1134,7 @@ void QWaylandSurfacePrivate::Subsurface::subsurface_set_desync(wl_subsurface::Re
 /*!
  * \fn void QWaylandSurface::surfaceDestroyed()
  *
- * This signal is emitted when the corresponing wl_surface is destroyed.
+ * This signal is emitted when the corresponding wl_surface is destroyed.
  */
 
 /*!

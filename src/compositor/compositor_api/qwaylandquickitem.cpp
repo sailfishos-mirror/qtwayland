@@ -479,7 +479,7 @@ void QWaylandQuickItemPrivate::handleDragEnded(QWaylandSeat *seat)
  * \nativetype QWaylandQuickItem
  * \inqmlmodule QtWayland.Compositor
  * \since 5.8
- * \brief Provides a Qt Quick item that represents a WaylandView.
+ * \brief Provides a Qt Quick item that represents a QWaylandView.
  *
  * Qt Quick-based Wayland compositors can use this type to display a client's
  * contents on an output device. It passes user input to the
@@ -595,13 +595,19 @@ void QWaylandQuickItem::setSurface(QWaylandSurface *surface)
 /*!
  * \qmlproperty enum QtWayland.Compositor::WaylandQuickItem::origin
  *
- * This property holds the origin of the QWaylandQuickItem.
+ * This property reflects the origin of the surface's current buffer, that is,
+ * which corner of the buffer corresponds to coordinate (0, 0).
+ *
+ * \sa WaylandSurface::origin
  */
 
 /*!
  * \property QWaylandQuickItem::origin
  *
- * This property holds the origin of the QWaylandQuickItem.
+ * This property reflects the origin of the surface's current buffer, that is,
+ * which corner of the buffer corresponds to coordinate (0, 0).
+ *
+ * \sa QWaylandSurface::origin
  */
 QWaylandSurface::Origin QWaylandQuickItem::origin() const
 {
@@ -1361,20 +1367,19 @@ QVariant QWaylandQuickItem::inputMethodQuery(Qt::InputMethodQuery query, QVarian
 
 /*!
     \qmlproperty bool QtWayland.Compositor::WaylandQuickItem::paintEnabled
+    \default true
 
-    Returns true if the item is hidden, though the texture
-    is still updated. As opposed to hiding the item by
-    setting \l{Item::visible}{visible} to \c false, setting this property to \c false
-    will not prevent mouse or keyboard input from reaching item.
+    Setting this property to \c false will stop rendering the item. As opposed
+    to hiding the item by setting \l{Item::visible}{visible} to \c false, it
+    will not prevent mouse or keyboard input from reaching the item.
 */
 
 /*!
     \property QWaylandQuickItem::paintEnabled
 
-    Holds \c true if the item is hidden, though the texture
-    is still updated. As opposed to hiding the item by
-    setting \l{QQuickItem::}{visible} to \c false, setting this property to \c false
-    will not prevent mouse or keyboard input from reaching item.
+    Setting this property to \c false will stop rendering the item. As opposed
+    to hiding the item by setting \l{Item::visible}{visible} to \c false, it
+    will not prevent mouse or keyboard input from reaching the item.
 */
 bool QWaylandQuickItem::isPaintEnabled() const
 {

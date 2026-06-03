@@ -56,7 +56,7 @@
  * directly on the ShellSurface. See the various implementations for additional properties and
  * signals.
  *
- * \sa WaylandSurface, ShellSurfaceItem, WlShellSurface, IviSurface
+ * \sa WaylandSurface, ShellSurfaceItem, XdgSurface, IviSurface, WlShellSurface
  */
 
 /*!
@@ -68,7 +68,7 @@
  * This interface represents a Wayland surface role given by a Wayland protocol extension that
  * defines how the QWaylandSurface should map onto the screen.
  *
- * \sa QWaylandSurface, QWaylandWlShellSurface, QWaylandIviSurface, QWaylandShellSurfaceTemplate
+ * \sa QWaylandSurface, QWaylandXdgSurface, QWaylandIviSurface, QWaylandWlShellSurface, QWaylandShellSurfaceTemplate
  */
 
 #if QT_CONFIG(wayland_compositor_quick)
@@ -85,13 +85,13 @@
 /*!
  * \qmlproperty enum QtWayland.Compositor::ShellSurface::windowType
  *
- * This property holds the window type of the ShellSurface.
+ * This property holds the \l{Qt::WindowType}{window type} of the ShellSurface.
  */
 
 /*!
  * \property QWaylandShellSurface::windowType
  *
- * This property holds the window type of the QWaylandShellSurface.
+ * This property holds the \l{Qt::WindowType}{window type} of the QWaylandShellSurface.
  */
 
 /*!
