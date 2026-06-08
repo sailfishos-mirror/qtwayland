@@ -25,7 +25,11 @@ QtShellIntegration::QtShellIntegration(QWaylandQuickShellSurfaceItem *item)
 
 QtShellIntegration::~QtShellIntegration()
 {
-    m_item->setSurface(nullptr);
+    // When m_shellSurface is null, handleQtShellSurfaceDestroyed() already ran, which means that the
+    // QWaylandQtShellSurface was destroyed before the wl_surface. If so, the surface is left attached
+    // to the QWaylandQuickItem, so the wl_surface destruction path can still emit surfaceDestroyed.
+    if (m_shellSurface)
+        m_item->setSurface(nullptr);
 }
 
 void QtShellIntegration::handleQtShellSurfaceDestroyed()
