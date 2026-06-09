@@ -5,7 +5,7 @@
 #ifndef QWAYLANDQTWINDOWMANAGER_P_H
 #define QWAYLANDQTWINDOWMANAGER_P_H
 
-#include <QtCore/QMap>
+#include <QtCore/QHash>
 
 #include <QtWaylandCompositor/QWaylandQtWindowManager>
 #include <QtWaylandCompositor/private/qwaylandcompositorextension_p.h>
