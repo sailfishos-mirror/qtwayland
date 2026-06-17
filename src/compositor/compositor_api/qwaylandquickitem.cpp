@@ -479,7 +479,7 @@ void QWaylandQuickItemPrivate::handleDragEnded(QWaylandSeat *seat)
  * \nativetype QWaylandQuickItem
  * \inqmlmodule QtWayland.Compositor
  * \since 5.8
- * \brief Provides a Qt Quick item that represents a QWaylandView.
+ * \brief The WaylandQuickItem type provides a Qt Quick item which represents the surface of a Wayland client.
  *
  * Qt Quick-based Wayland compositors can use this type to display a client's
  * contents on an output device. It passes user input to the
@@ -490,7 +490,7 @@ void QWaylandQuickItemPrivate::handleDragEnded(QWaylandSeat *seat)
  * \class QWaylandQuickItem
  * \inmodule QtWaylandCompositor
  * \since 5.8
- * \brief The QWaylandQuickItem class provides a Qt Quick item representing a QWaylandView.
+ * \brief The QWaylandQuickItem class provides a Qt Quick item which represents the surface of a Wayland client.
  *
  * When writing a QWaylandCompositor in Qt Quick, this class can be used to display a
  * client's contents on an output device and will pass user input to the
