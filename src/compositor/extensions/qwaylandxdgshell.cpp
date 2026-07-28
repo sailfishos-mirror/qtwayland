@@ -1949,10 +1949,16 @@ uint QWaylandXdgPopupPrivate::sendConfigure(const QRect &geometry)
     return serial;
 }
 
-void QWaylandXdgPopupPrivate::xdg_popup_destroy(QtWaylandServer::xdg_popup::Resource *resource)
+void QWaylandXdgPopupPrivate::xdg_popup_destroy_resource(QtWaylandServer::xdg_popup::Resource *resource)
 {
     Q_UNUSED(resource);
-    qWarning() << Q_FUNC_INFO << "Not implemented"; //TODO
+    Q_Q(QWaylandXdgPopup);
+    delete q;
+}
+
+void QWaylandXdgPopupPrivate::xdg_popup_destroy(QtWaylandServer::xdg_popup::Resource *resource)
+{
+    wl_resource_destroy(resource->handle);
 }
 
 void QWaylandXdgPopupPrivate::xdg_popup_grab(QtWaylandServer::xdg_popup::Resource *resource, wl_resource *seat, uint32_t serial)
