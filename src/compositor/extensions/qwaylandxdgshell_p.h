@@ -181,6 +181,7 @@ private:
     uint sendConfigure(const QRect &geometry);
 
 protected:
+    void xdg_popup_destroy_resource(Resource *resource) override;
     void xdg_popup_destroy(Resource *resource) override;
     void xdg_popup_grab(Resource *resource, struct ::wl_resource *seat, uint32_t serial) override;
 
