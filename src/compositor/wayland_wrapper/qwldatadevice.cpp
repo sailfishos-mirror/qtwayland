@@ -147,6 +147,14 @@ void DataDevice::data_device_start_drag(Resource *resource, struct ::wl_resource
     //### need to verify that we have an implicit grab with this serial
 }
 
+void DataDevice::data_device_destroy_resource(Resource *resource)
+{
+    if (m_dragFocusResource == resource) {
+        m_dragFocusResource = nullptr;
+        m_dragFocus = nullptr;
+    }
+}
+
 void DataDevice::setDragIcon(QWaylandSurface *icon)
 {
     if (icon == m_dragIcon)

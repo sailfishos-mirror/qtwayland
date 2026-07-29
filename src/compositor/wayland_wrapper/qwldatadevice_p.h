@@ -53,6 +53,7 @@ public:
 protected:
 #if QT_CONFIG(draganddrop)
     void data_device_start_drag(Resource *resource, struct ::wl_resource *source, struct ::wl_resource *origin, struct ::wl_resource *icon, uint32_t serial) override;
+    void data_device_destroy_resource(Resource *resource) override;
 #endif
     void data_device_set_selection(Resource *resource, struct ::wl_resource *source, uint32_t serial) override;
 
