@@ -385,12 +385,14 @@ void LinuxDmabufParams::zwp_linux_buffer_params_v1_add(Resource *resource, int32
         wl_resource_post_error(resource->handle,
                                ZWP_LINUX_BUFFER_PARAMS_V1_ERROR_PLANE_IDX,
                                "Plane index %i is out of bounds", plane_idx);
+        return;
     }
 
     if (m_planes.contains(plane_idx)) {
         wl_resource_post_error(resource->handle,
                                ZWP_LINUX_BUFFER_PARAMS_V1_ERROR_PLANE_SET,
                                "Plane already set");
+        return;
     }
 
     Plane plane;
