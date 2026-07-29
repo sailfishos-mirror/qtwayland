@@ -58,6 +58,7 @@ public:
     ivi_application *iviApplication = nullptr;
     zwp_idle_inhibit_manager_v1 *idleInhibitManager = nullptr;
     QtWayland::zxdg_output_manager_v1 *xdgOutputManager = nullptr;
+    wl_data_device_manager *dataDeviceManager = nullptr;
 
     QList<MockSeat *> m_seats;
 
