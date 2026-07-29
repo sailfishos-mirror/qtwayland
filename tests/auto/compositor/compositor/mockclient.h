@@ -47,6 +47,7 @@ public:
 
     wl_display *display = nullptr;
     wl_compositor *compositor = nullptr;
+    wl_subcompositor *subCompositor = nullptr;
     QMap<uint, wl_output *> m_outputs;
     QMap<wl_output *, MockXdgOutputV1 *> m_xdgOutputs;
     wl_shm *shm = nullptr;

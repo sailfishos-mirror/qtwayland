@@ -154,6 +154,8 @@ void MockClient::handleGlobal(uint32_t id, const QByteArray &interface)
 {
     if (interface == "wl_compositor") {
         compositor = static_cast<wl_compositor *>(wl_registry_bind(registry, id, &wl_compositor_interface, 4));
+    } else if (interface == "wl_subcompositor") {
+        subCompositor = static_cast<wl_subcompositor *>(wl_registry_bind(registry, id, &wl_subcompositor_interface, 1));
     } else if (interface == "wl_output") {
         auto output = static_cast<wl_output *>(wl_registry_bind(registry, id, &wl_output_interface, 2));
         m_outputs.insert(id, output);

@@ -344,6 +344,24 @@ void QWaylandCompositorPrivate::subcompositor_get_subsurface(wl_subcompositor::R
     Q_Q(QWaylandCompositor);
     QWaylandSurface *childSurface = QWaylandSurface::fromResource(surface);
     QWaylandSurface *parentSurface = QWaylandSurface::fromResource(parent);
+
+    QWaylandSurfacePrivate *childSurface_d = QWaylandSurfacePrivate::get(childSurface);
+    QWaylandSurfacePrivate *parentSurface_d = QWaylandSurfacePrivate::get(parentSurface);
+    Q_ASSERT(childSurface_d != nullptr && parentSurface_d != nullptr);
+
+    // Walk the requested parent's existing ancestor chain and reject if it already includes the
+    // child surface.
+    for (QWaylandSurfacePrivate *ancestor = parentSurface_d;
+         ancestor != nullptr;
+         ancestor = ancestor->parentSurface()) {
+        if (ancestor == childSurface_d) {
+            wl_resource_post_error(resource->handle,
+                                   WL_SUBCOMPOSITOR_ERROR_BAD_PARENT,
+                                   "surface cannot be made a transitive parent of itself");
+            return;
+        }
+    }
+
     QWaylandSurfacePrivate::get(childSurface)->initSubsurface(parentSurface, resource->client(), id, 1);
     QWaylandSurfacePrivate::get(parentSurface)->subsurfaceChildren.append(childSurface);
     emit q->subsurfaceChanged(childSurface, parentSurface);
