@@ -94,6 +94,8 @@ private slots:
 
     void xdgOutput();
 
+    void subsurfaceSelfParentIsRejected();
+
 private:
     QTemporaryDir m_tmpRuntimeDir;
 };
@@ -1791,6 +1793,25 @@ void tst_WaylandCompositor::xdgOutput()
     QTRY_COMPARE(xdgOutput->description, "This is a test output");
     QTRY_COMPARE(xdgOutput->logicalPosition, QPoint(100, 100));
     QTRY_COMPARE(xdgOutput->logicalSize, QSize(1000, 1000));
+}
+
+void tst_WaylandCompositor::subsurfaceSelfParentIsRejected()
+{
+    TestCompositor compositor;
+    compositor.create();
+
+    MockClient client;
+    QTRY_VERIFY(client.subCompositor);
+
+    wl_surface *surface = client.createSurface();
+    QTRY_COMPARE(compositor.surfaces.size(), 1);
+
+    // Reject passing the surface itself as its parent
+    wl_subcompositor_get_subsurface(client.subCompositor, surface, surface);
+
+    QTRY_COMPARE(client.error, EPROTO);
+    QCOMPARE(client.protocolError.interface, &wl_subcompositor_interface);
+    QCOMPARE(static_cast<wl_subcompositor_error>(client.protocolError.code), WL_SUBCOMPOSITOR_ERROR_BAD_PARENT);
 }
 
 #include <tst_compositor.moc>
