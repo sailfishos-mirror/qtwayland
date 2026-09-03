@@ -395,7 +395,7 @@ void QWaylandWindow::setGeometry(const QRect &r)
 {
     auto rect = r;
     if (fixedToplevelPositions && !QPlatformWindow::parent() && window()->type() != Qt::Popup
-        && window()->type() != Qt::ToolTip) {
+        && window()->type() != Qt::ToolTip && window()->type() != Qt::Tool) {
         rect.moveTo(screen()->geometry().topLeft());
     }
     setGeometry_helper(rect);
@@ -808,6 +808,7 @@ QMargins QWaylandWindow::clientSideMargins() const
 void QWaylandWindow::setCustomMargins(const QMargins &margins) {
     const QMargins oldMargins = mCustomMargins;
     mCustomMargins = margins;
+    propagateSizeHints();
     setGeometry(geometry().marginsRemoved(oldMargins).marginsAdded(margins));
 }
 
@@ -1311,7 +1312,7 @@ void QWaylandWindow::handleScreensChanged()
 
     mLastReportedScreen = newScreen;
     if (fixedToplevelPositions && !QPlatformWindow::parent() && window()->type() != Qt::Popup
-        && window()->type() != Qt::ToolTip
+        && window()->type() != Qt::ToolTip && window()->type() != Qt::Tool
         && geometry().topLeft() != newScreen->geometry().topLeft()) {
         auto geometry = this->geometry();
         geometry.moveTo(newScreen->geometry().topLeft());
